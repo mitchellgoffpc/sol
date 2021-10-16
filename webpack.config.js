@@ -1,6 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 
 module.exports = {
@@ -11,23 +11,28 @@ module.exports = {
     entry: './src/index.js',
     output: {
          path: path.resolve(__dirname, 'build'),
-         publicPath: "/assets/",
+         publicPath: "",
          filename: 'app.bundle.js' },
 
     resolve: {
-        extensions: ['.ts', '.js'],
+        extensions: ['.js'],
         modules: ['./src', './node_modules'] },
 
     module: {
         rules: [
             { test: /worker\.js$/,
-              use: { loader: 'worker-loader' }},
-            { test: /\.[jt]s$/,
+              use: ['worker-loader'] },
+            { test: /\.js$/,
               exclude: /node_modules/,
-              use: { loader: 'babel-loader' }}]},
+              use: ['babel-loader'] },
+            { test: /\.css$/,
+              use: ['style-loader', 'css-loader'] }]},
 
+    performance: { hints: false },
     plugins: [
-        new CopyWebpackPlugin([{ from: './src/static' }])],
+        new HtmlWebpackPlugin({ template: './src/index.html' })],
 
     devServer: {
-        contentBase: path.resolve(__dirname, 'build') }}
+        historyApiFallback: true,
+        static: {
+            directory: path.resolve(__dirname, "build") }}}

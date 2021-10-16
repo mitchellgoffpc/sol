@@ -1,10 +1,11 @@
+import "assets/index.css"
+
 import * as Three from 'three'
 import map from 'lodash-es/map'
 
 import Player from 'player'
 import World from 'world'
 import Directions from 'util/directions'
-
 
 
 // Constants
