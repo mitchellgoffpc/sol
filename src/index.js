@@ -84,7 +84,8 @@ window.addEventListener("load", () => {
 
         if (totalTime > 1000) {
             const fps = drawCount / totalTime * 1000
+            const draws = renderer.info.render.calls
             totalTime = 0, drawCount = 0
-            document.querySelector ("#frame-rate") .innerHTML = `${fps.toFixed(2)}fps` }}
+            document.querySelector ("#frame-rate") .innerHTML = `${fps.toFixed(2)}fps | ${draws} draw calls` }}
 
     draw () })
