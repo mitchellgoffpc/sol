@@ -1,18 +1,17 @@
 import "assets/index.css"
 
-import * as Three from 'three'
 import map from 'lodash-es/map'
-
 import Player from 'player'
 import World from 'world'
 import Directions from 'util/directions'
+import { Vector3, WebGLRenderer } from 'rendering'
 
 
 // Constants
 
-const UP = new Three.Vector3 (0, 1, 0)
-const DOWN = new Three.Vector3 (0, -1, 0)
-const ZERO = new Three.Vector3 (0, 0, 0)
+const UP = new Vector3 (0, 1, 0)
+const DOWN = new Vector3 (0, -1, 0)
+const ZERO = new Vector3 (0, 0, 0)
 
 const KEY_DIRECTIONS = {
     16: Directions.DOWN.vector,
@@ -32,7 +31,7 @@ const getMovementVector = activeKeys =>
 // Application entry point
 
 window.addEventListener("load", () => {
-    const renderer = new Three.WebGLRenderer ({ antialias: true })
+    const renderer = new WebGLRenderer ({ antialias: true })
     const world = new World ()
     const player = new Player (world)
 
@@ -45,7 +44,7 @@ window.addEventListener("load", () => {
 
     player.handleResizeCamera (window.innerWidth, window.innerHeight)
     renderer.setSize (window.innerWidth, window.innerHeight)
-    document.body.appendChild (renderer.domElement)
+    document.body.appendChild (renderer.canvas)
 
     // Attach the event handlers
 

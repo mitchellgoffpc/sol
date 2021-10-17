@@ -6,6 +6,7 @@ import Blocks from 'blocks'
 import Entity from 'entities'
 import M from 'util/math'
 import Shapes from 'util/shapes'
+import { PerspectiveCamera } from 'rendering'
 
 
 // Constants
@@ -52,7 +53,7 @@ export default class Player {
     currentCrosshairTarget = null
 
     playerEntity = new PlayerEntity ()
-    camera = new Three.PerspectiveCamera (45, 1, 0.1, 1000)
+    camera = new PerspectiveCamera (45, 1, 0.1, 1000)
 
     constructor (world) {
         this.world = world
@@ -88,7 +89,6 @@ export default class Player {
 
     handleRefreshChunks = (previous, next) => {
         if (previous && !eq (previous, next)) {
-            console.log (next)
             AXES.forEach (({ a, b, c }) => {
                 const dir = next[a] - previous[a] > 0 ? 1 : -1
                 const prevA = previous[a], prevB = previous[b]
