@@ -16,7 +16,6 @@ import Entity from 'entities'
 import Chunk from 'world/chunk'
 import TerrainWorker from 'world/terrain.worker'
 import GeometryWorker from 'world/geometry.worker'
-import PhysicsEngine from 'physics/engine'
 import MachineryEngine from 'physics/machinery/engine'
 
 import Shapes from 'util/shapes'
@@ -36,7 +35,6 @@ const coords = (x, y, z) =>
 export default class World {
     scene = new Three.Scene ()
     raycaster = new Three.Raycaster ()
-    physics = new PhysicsEngine ()
     machinery = new MachineryEngine ()
     terrainWorker = new TerrainWorker ()
     geometryWorker = new GeometryWorker ()
@@ -60,7 +58,7 @@ export default class World {
         // Add event handlers
         this.terrainWorker.addEventListener ("message", this.handleTerrainWorkerMessage)
         this.geometryWorker.addEventListener ("message", this.handleGeometryWorkerMessage)
-        this.physics.onStep (this.handleEntityUpdate)
+        // this.physics.onStep (this.handleEntityUpdate)
 
         // Generate chunks for the spawn area
         for (let x = -RENDER_DISTANCE - 1; x <= RENDER_DISTANCE + 1; x++) {
@@ -87,7 +85,8 @@ export default class World {
 
         if (entity.needsGameTick) { /* tick */ }
         if (entity.needsPhysicsBody) {
-            this.physics.addEntity (entity.uuid, position, entity.properties) }}
+            // this.physics.addEntity (entity.uuid, position, entity.properties)
+        }}
 
 
     // Methods for destroying blocks and entities
@@ -100,7 +99,7 @@ export default class World {
 
     destroyEntity (entity) {
         this.scene.remove (entity.mesh)
-        this.physics.removeEntity (entity.uuid)
+        // this.physics.removeEntity (entity.uuid)
         delete this.entities[entity.uuid] }
 
 
@@ -190,12 +189,9 @@ export default class World {
                 const chunk = this.chunks[coords (position.x, position.y, position.z)]
                 chunk.createBufferGeometry (buffers, vertexBufferSize, blockFaceBufferSize)
 
-                // This is just for testing
-                if (position.x === 0 && position.y === 2 && position.z === 0) {
-                    this.spawnEntity ({ x: 4, y: 60, z: 13.5 }, new Entity ({ shape: Shapes.SPHERE, radius: 1, mass: 5 })) }
-
-                if (this.shouldCreatePhysicsBodyForChunk (position))
-                    this.physics.addChunk (position, buffers.vertexBuffer, vertexBufferSize) }) }}
+                // if (this.shouldCreatePhysicsBodyForChunk (position))
+                //     this.physics.addChunk (position, buffers.vertexBuffer, vertexBufferSize)
+            }) }}
 
     handleEntityUpdate = (uuid, position) => {
         this.entities[uuid].mesh.position.copy (position) }
@@ -204,7 +200,8 @@ export default class World {
     // Update method
 
     step (dt) {
-        this.physics.step (dt) }
+        // this.physics.step (dt)
+    }
 
 
     // Miscellaneous helper methods
