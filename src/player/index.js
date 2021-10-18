@@ -6,7 +6,7 @@ import Blocks from 'blocks'
 import Entity from 'entities'
 import M from 'util/math'
 import Shapes from 'util/shapes'
-import { PerspectiveCamera } from 'rendering'
+import PerspectiveCamera from 'rendering/camera'
 
 
 // Constants

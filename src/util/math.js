@@ -1,4 +1,4 @@
-import { Vector3 } from 'rendering'
+import { Vector3 } from 'rendering/vectors'
 
 
 // Math utility class

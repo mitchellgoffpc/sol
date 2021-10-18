@@ -1,14 +1,15 @@
-import * as Three from 'three'
 import uuid from 'uuid/v4'
 
 import Blocks from 'blocks'
 import Directions from 'util/directions'
+import { Mesh,
+         BufferGeometry,
+         BufferAttribute } from 'rendering/geometry'
 import { getVerticesForSide } from 'util/geometry'
 import { getBlockIndex,
          getBlockIndexForPosition,
          getPositionForBlockIndex,
          positionIsWithinChunk } from 'util/coordinates'
-
 
 // Chunk class
 
@@ -74,6 +75,7 @@ export default class Chunk {
         this.placeBlock (faceDirection.getAdjacentPosition (position), block) }
 
     placeLight (position, intensity = 1.0) {
+        return
         const { x: wx, y: wy, z: wz } = this.getWorldPosFromChunkPos (position)
         const light = new Three.PointLight (0xFFFFFF, intensity)
         light.position.set (wx, wy, wz)
@@ -234,17 +236,18 @@ export default class Chunk {
         this.blockIndicesForFaces = buffers.blockIndicesForFaces
         this.blockIndicesForBFBOffsets = buffers.blockIndicesForBFBOffsets
 
-        const geometry = new Three.BufferGeometry ()
-        const material = new Three.MeshLambertMaterial ({ vertexColors: Three.VertexColors })
+        const geometry = new BufferGeometry ()
+        const material = null
+        // const material = new MeshLambertMaterial ({ vertexColors: Three.VertexColors })
 
-        geometry.setAttribute ('position', new Three.BufferAttribute (buffers.vertexBuffer, 3))
-        geometry.setAttribute ('color',    new Three.BufferAttribute (buffers.colorBuffer, 3))
-        geometry.setDrawRange (0, vertexBufferSize / 3)
-        geometry.computeVertexNormals ()
+        geometry.setAttribute ('position', new BufferAttribute (buffers.vertexBuffer, 3))
+        geometry.setAttribute ('color',    new BufferAttribute (buffers.colorBuffer, 3))
+        // geometry.setDrawRange (0, vertexBufferSize / 3)
+        // geometry.computeVertexNormals ()
 
-        this.mesh = new Three.Mesh (geometry, material)
+        this.mesh = new Mesh (geometry, material)
         this.mesh.name = "CHUNK"
-        this.mesh.position.set (this.position.x * 16, this.position.y * 16, this.position.z * 16)
+        this.mesh.setPosition (this.position.x * 16, this.position.y * 16, this.position.z * 16)
         this.world.scene.add (this.mesh) }
 
 

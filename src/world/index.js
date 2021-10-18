@@ -1,5 +1,3 @@
-import * as Three from 'three'
-
 import map from 'lodash-es/map'
 import chunk from 'lodash-es/chunk'
 import first from 'lodash-es/first'
@@ -17,7 +15,7 @@ import Chunk from 'world/chunk'
 import TerrainWorker from 'world/terrain.worker'
 import GeometryWorker from 'world/geometry.worker'
 import MachineryEngine from 'physics/machinery/engine'
-
+import Scene from 'rendering/scene'
 import Shapes from 'util/shapes'
 import Directions from 'util/directions'
 
@@ -33,8 +31,8 @@ const coords = (x, y, z) =>
 // World class
 
 export default class World {
-    scene = new Three.Scene ()
-    raycaster = new Three.Raycaster ()
+    scene = new Scene ()
+    // raycaster = new Three.Raycaster ()
     machinery = new MachineryEngine ()
     terrainWorker = new TerrainWorker ()
     geometryWorker = new GeometryWorker ()
@@ -44,16 +42,16 @@ export default class World {
     chunksLoaded = 0
 
     constructor () {
-        this.scene.background = new Three.Color (0xADCCFF)
-        this.scene.fog = new Three.Fog (0xADCCFF, (RENDER_DISTANCE - 8) * 16, (RENDER_DISTANCE - 1) * 16)
-        this.scene.add (new Three.AmbientLight (0x404040))
+        // this.scene.background = new Three.Color (0xADCCFF)
+        // this.scene.fog = new Three.Fog (0xADCCFF, (RENDER_DISTANCE - 8) * 16, (RENDER_DISTANCE - 1) * 16)
+        // this.scene.add (new Three.AmbientLight (0x404040))
 
-        const northLight = new Three.DirectionalLight (0xFFFFFF, 0.5)
-        const southLight = new Three.DirectionalLight (0xFFFFFF, 0.5)
-        northLight.position.set (100, 100, 50)
-        southLight.position.set (-100, 100, -50)
-        this.scene.add (northLight)
-        this.scene.add (southLight)
+        // const northLight = new Three.DirectionalLight (0xFFFFFF, 0.5)
+        // const southLight = new Three.DirectionalLight (0xFFFFFF, 0.5)
+        // northLight.position.set (100, 100, 50)
+        // southLight.position.set (-100, 100, -50)
+        // this.scene.add (northLight)
+        // this.scene.add (southLight)
 
         // Add event handlers
         this.terrainWorker.addEventListener ("message", this.handleTerrainWorkerMessage)
@@ -80,7 +78,7 @@ export default class World {
 
     spawnEntity (position, entity) {
         entity.mesh.position.set (position.x, position.y, position.z)
-        this.scene.add (entity.mesh)
+        // this.scene.add (entity.mesh)
         this.entities[entity.uuid] = entity
 
         if (entity.needsGameTick) { /* tick */ }
@@ -219,8 +217,9 @@ export default class World {
         this.withChunk (position, chunk => chunk.getWorldPosFromChunkPos (chunk.getBlockPositionForFaceIndex (faceIndex)))
 
     getIntersections (position, direction) {
-        this.raycaster.set (position, direction)
-        return this.raycaster.intersectObjects (this.scene.children) }
+        return [] }
+        // this.raycaster.set (position, direction)
+        // return this.raycaster.intersectObjects (this.scene.children) }
 
     getClosestIntersection = (position, direction) =>
          first (sortBy (this.getIntersections (position, direction), 'distance'))

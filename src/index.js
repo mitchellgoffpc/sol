@@ -4,14 +4,11 @@ import map from 'lodash-es/map'
 import Player from 'player'
 import World from 'world'
 import Directions from 'util/directions'
-import { Vector3, WebGLRenderer } from 'rendering'
+import WebGLRenderer from 'rendering/engine'
+import { ZERO } from 'rendering/vectors'
 
 
 // Constants
-
-const UP = new Vector3 (0, 1, 0)
-const DOWN = new Vector3 (0, -1, 0)
-const ZERO = new Vector3 (0, 0, 0)
 
 const KEY_DIRECTIONS = {
     16: Directions.DOWN.vector,
