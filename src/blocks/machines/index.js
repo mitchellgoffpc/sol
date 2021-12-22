@@ -1,4 +1,4 @@
-import { sumBy } from 'lodash-es'
+import { flow, filter, every, sumBy, forEach } from 'lodash/fp'
 import Block from 'blocks'
 
 
@@ -6,22 +6,27 @@ export default class Machine extends Block {
     basePosition = 0
     baseVelocity = 0
 
+    constructor () {
+        super (0, [], [])
+        this.mesh = this.createMesh () }
+
+    createMesh () { return null }
     getEffectiveMass () { return 1 }
 
     getAcceleration (connection) {
         return this.getBaseForce (this.basePosition, this.baseVelocity) +
-               sumBy (this.connections.filter (x => x !== connection),
-                      x => x.getAcceleration (this)) }
+               flow (filter (x => x !== connection),
+                     sumBy  (x => x.getAcceleration (this))) (this.connections) }
 
     checkPosition (connection, position) {
         return this.checkBasePosition (position) &&
-               this.connections.filter (x => x !== connection)
-                               .every  (x => x.checkPosition (this, position)) }
+               flow (filter (x => x !== connection),
+                     every  (x => x.checkPosition (this, position))) (this.connections) }
 
     updatePosition (connection, position, velocity) {
         this.updateBasePosition (position, velocity)
-        this.connections.filter  (x => x !== connection)
-                        .forEach (x => x.updatePosition (this, position, velocity)) }
+        flow (filter  (x => x !== connection),
+              forEach (x => x.updatePosition (this, position, velocity))) (this.connections) }
 
     // Stub methods to modify the behavior of the base node
     getBaseForce () { return 0 }

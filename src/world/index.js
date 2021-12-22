@@ -1,11 +1,13 @@
 import * as Three from 'three'
-import { first, range, filter, negate, sortBy } from 'lodash-es'
+import { first, range, filter, negate, sortBy } from 'lodash'
 
 import Chunk from 'world/chunk'
 import TerrainWorker from 'world/terrain.worker'
 import GeometryWorker from 'world/geometry.worker'
 import MachineryEngine from 'physics/machinery/engine'
 import Directions from 'util/directions'
+
+import Piston from 'blocks/machines/piston'
 
 const RENDER_DISTANCE = 20
 
@@ -46,6 +48,8 @@ export default class World {
         this.geometryWorker.addEventListener ("message", this.handleGeometryWorkerMessage)
         // this.physics.onStep (this.handleEntityUpdate)
 
+        this.placeMachine (new Three.Vector3 (8, 46, 14), new Piston (.001))
+
         // Generate chunks for the spawn area
         for (let x = -RENDER_DISTANCE - 1; x <= RENDER_DISTANCE + 1; x++) {
             for (let z = -RENDER_DISTANCE - 1; z <= RENDER_DISTANCE + 1; z++) {
@@ -61,7 +65,9 @@ export default class World {
         this.withChunk (position, chunk => chunk.placeBlockOnFace (faceIndex, block)) }
 
     placeMachine (position, machine) {
-        this.placeBlock (position, machine)
+        // this.placeBlock (position, machine)
+        machine.mesh.position.set (position.x, position.y, position.z)
+        this.scene.add (machine.mesh)
         this.machinery.addMachine (machine) }
 
     spawnEntity (position, entity) {
@@ -72,7 +78,8 @@ export default class World {
         if (entity.needsGameTick) { /* tick */ }
         if (entity.needsPhysicsBody) {
             // this.physics.addEntity (entity.uuid, position, entity.properties)
-        }}
+        }
+    }
 
 
     // Methods for destroying blocks and entities
@@ -187,6 +194,7 @@ export default class World {
 
     step (_) {
         // this.physics.step (dt)
+        this.machinery.step ()
     }
 
 
@@ -204,17 +212,17 @@ export default class World {
     getBlockPositionForFaceIndex = (position, faceIndex) =>
         this.withChunk (position, chunk => chunk.getWorldPosFromChunkPos (chunk.getBlockPositionForFaceIndex (faceIndex)))
 
-    getIntersections (position, direction) {
+    getIntersections = (position, direction) => {
         this.raycaster.set (position, direction)
         return this.raycaster.intersectObjects (this.scene.children) }
 
     getClosestIntersection = (position, direction) =>
          first (sortBy (this.getIntersections (position, direction), 'distance'))
 
-    setChunkAtCoords ({ x, y, z }, chunk) {
+    setChunkAtCoords = ({ x, y, z }, chunk) => {
         this.chunks[coords (x, y, z)] = chunk }
 
-    setBlockHighlight (position, highlight) {
+    setBlockHighlight = (position, highlight) => {
         this.withChunk (position, (chunk, chunkPos) => chunk.setBlockHighlight (chunkPos, highlight)) }
 
     shouldCreateGeometryForChunk = chunk =>

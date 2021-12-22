@@ -1,4 +1,4 @@
-import { pull, forEach } from 'lodash-es'
+import { pull, forEach } from 'lodash'
 
 import Joint from 'physics/machinery/joints'
 

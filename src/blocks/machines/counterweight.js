@@ -1,7 +1,7 @@
 import Machine from 'blocks/machines'
 import Pivot from 'blocks/geometry/pivot'
 import LinearConnection from 'physics/machinery/connections/linear'
-import GeometryBuilder from 'util/geometry'
+import GeometryBuilder from 'util/geometry-builder'
 
 
 export default class Counterweight extends Machine {

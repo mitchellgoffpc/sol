@@ -1,4 +1,4 @@
-import { id, isFunction } from 'lodash-es'
+import { isFunction, identity as id } from 'lodash'
 import Joint from 'physics/machinery/joints'
 
 

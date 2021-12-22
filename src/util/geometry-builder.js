@@ -3,7 +3,7 @@ import * as Three from 'three'
 
 // Utility class for creating Three.js meshes
 
-export class GeometryBuilder {
+export default class GeometryBuilder {
     group = new Three.Group ()
 
     getMesh () { return this.group }

@@ -1,4 +1,4 @@
-import GeometryBuilder from 'util/geometry'
+import GeometryBuilder from 'util/geometry-builder'
 
 
 export default class Pivot {

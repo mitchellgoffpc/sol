@@ -1,4 +1,4 @@
-import { map, chunk, times, flatten, fromPairs, pickBy } from 'lodash-es'
+import { map, chunk, times, flatten, fromPairs, pickBy } from 'lodash'
 
 // Helper functions
 const hexToFloats = hexCode => {
