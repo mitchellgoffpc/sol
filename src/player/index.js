@@ -1,11 +1,11 @@
 import * as Three from 'three'
-import map from 'lodash-es/map'
-import range from 'lodash-es/range'
+import { map, range } from 'lodash-es'
 
 import Blocks from 'blocks'
 import Entity from 'entities'
 import M from 'util/math'
 import Shapes from 'util/shapes'
+import PlayerInventory from 'player/inventory'
 
 
 // Constants
@@ -52,6 +52,7 @@ export default class Player {
     currentCrosshairTarget = null
 
     playerEntity = new PlayerEntity ()
+    inventory = new PlayerInventory ()
     camera = new Three.PerspectiveCamera (45, 1, 0.1, 1000)
 
     constructor (world) {
@@ -60,6 +61,8 @@ export default class Player {
 
 
     // Event handlers
+
+    handleShowInventory = this.inventory.handleShowWindow
 
     handleUpdateRotation = (movementX, movementY) => {
         let rx = this.rotation.x - movementX / 500

@@ -5,6 +5,8 @@ canvas {
     width: 100%;
     height: 100%; }
 
+/* Main UI */
+
 .cross-hairs {
     position: absolute;
     z-index: 5;
@@ -25,3 +27,53 @@ canvas {
     left: 20px;
     font-family: Helvetica, sans-serif;
     font-size: 16px; }
+
+/* Inventory window */
+
+#inventory-window {
+    display: none;
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 200px;
+    padding: 10px;
+    background-color: #999; }
+
+#inventory-quickbar {
+    display: flex;
+    position: absolute;
+    z-index: 10;
+    bottom: 75px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 500px;
+    height: 50px;
+    background-color: #999;
+    border: 2px solid #999; }
+
+#inventory-window .row {
+    display: flex; }
+
+#inventory-window .column,
+#inventory-quickbar .column {
+    width: 46px;
+    height: 46px;
+    margin: 2px;
+    background-color: #CCC; }
+
+#inventory-window .icon,
+#inventory-quickbar .icon,
+.active-icon {
+    position: absolute;
+    z-index: 15;
+    width: 20px;
+    height: 20px;
+    transform: translate(-50%, -50%);
+    background-color: green;
+    cursor: pointer; }
+
+.active-icon {
+    pointer-events: none; }

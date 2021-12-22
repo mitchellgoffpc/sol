@@ -10,29 +10,29 @@ const vertexShader = dedent`
     varying vec2 vUv;
 
     void main() {
-	    vUv = uv;
-	    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }`
 
 
 const fragmentShader = dedent`
-	#include <packing>
+    #include <packing>
 
-	varying vec2 vUv;
+    varying vec2 vUv;
     uniform float entityRenderDepth;
     uniform float collisionRenderDepth;
     uniform sampler2D entityDepth;
-	uniform sampler2D collisionDepth;
-	uniform sampler2D collisionColor;
+    uniform sampler2D collisionDepth;
+    uniform sampler2D collisionColor;
 
-	void main() {
-		vec3 color = texture2D (collisionColor, vUv) .rgb;
+    void main() {
+        vec3 color = texture2D (collisionColor, vUv) .rgb;
         float collisionDepth = texture2D (collisionDepth, vUv) .x * collisionRenderDepth;
         float entityDepth = (1.0 - texture2D (entityDepth, vUv) .x) * entityRenderDepth;
 
         gl_FragColor.rgb = color;
-		gl_FragColor.a = (collisionDepth - entityDepth) / collisionRenderDepth;
-	}`
+        gl_FragColor.a = (collisionDepth - entityDepth) / collisionRenderDepth;
+    }`
 
 
 // Constants

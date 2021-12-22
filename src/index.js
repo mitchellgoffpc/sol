@@ -1,7 +1,7 @@
 import "assets/index.css"
 
 import * as Three from 'three'
-import map from 'lodash-es/map'
+import { map } from 'lodash-es'
 
 import Player from 'player'
 import World from 'world'
@@ -14,6 +14,7 @@ const UP = new Three.Vector3 (0, 1, 0)
 const DOWN = new Three.Vector3 (0, -1, 0)
 const ZERO = new Three.Vector3 (0, 0, 0)
 
+const KEY_INVENTORY = 69
 const KEY_DIRECTIONS = {
     16: Directions.DOWN.vector,
     32: Directions.UP.vector,
@@ -41,6 +42,12 @@ window.addEventListener("load", () => {
     let lastRenderTimestamp = null
     let drawCount = 0, totalTime = 0
 
+    const setPointerLock = lock => {
+        if (lock && !controlsAreEnabled)
+            document.body.requestPointerLock () .catch (e => {})
+        else if (!lock && controlsAreEnabled)
+            document.exitPointerLock () }
+
     // A little housekeeping
 
     player.handleResizeCamera (window.innerWidth, window.innerHeight)
@@ -58,16 +65,28 @@ window.addEventListener("load", () => {
         if (!controlsAreEnabled) { activeKeys.clear () }})
 
     document.addEventListener ("mousedown", event => {
-        if (!controlsAreEnabled) document.body.requestPointerLock ()
-        else if (event.which === 1) player.handlePlaceBlock ()
-        else if (event.which === 3) player.handleDestroyBlock () })
+        if (!controlsAreEnabled) {
+            setPointerLock (true)
+            player.handleShowInventory (false) }
+        else if (event.which === 1)
+            player.handlePlaceBlock ()
+        else if (event.which === 3)
+            player.handleDestroyBlock () })
 
     document.addEventListener ("mousemove", event => {
-        if (controlsAreEnabled) { player.handleUpdateRotation (event.movementX, event.movementY) }})
+        if (controlsAreEnabled) {
+            player.handleUpdateRotation (event.movementX, event.movementY) }})
+
     document.addEventListener ("keydown", event => {
-        if (controlsAreEnabled && event.which in KEY_DIRECTIONS) { activeKeys.add (event.which) }})
+        if (event.which in KEY_DIRECTIONS && controlsAreEnabled) {
+            activeKeys.add (event.which) }
+        else if (event.which === KEY_INVENTORY) {
+            setPointerLock (!controlsAreEnabled)
+            player.handleShowInventory (controlsAreEnabled) }})
+
     document.addEventListener ("keyup", event => {
-        if (controlsAreEnabled && event.which in KEY_DIRECTIONS) { activeKeys.delete (event.which) }})
+        if (event.which in KEY_DIRECTIONS && controlsAreEnabled) {
+            activeKeys.delete (event.which) }})
 
     // Render loop
 

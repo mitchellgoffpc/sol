@@ -1,19 +1,9 @@
-import map from 'lodash-es/map'
-import chunk from 'lodash-es/chunk'
-import flatten from 'lodash-es/flatten'
-import fromPairs from 'lodash-es/fromPairs'
-import pickBy from 'lodash-es/pickBy'
-
+import { map, chunk, times, flatten, fromPairs, pickBy } from 'lodash-es'
 
 // Helper functions
-const repeat = (data, n) => {
-    let result = new Array (n)
-    result.fill (data)
-    return result }
-
 const hexToFloats = hexCode => {
     let components = chunk (hexCode.substr (1), 2) .map (x => parseInt (x.join (''), 16) / 0xFF)
-    return Float32Array.from (flatten (repeat (components, 3))) }
+    return Float32Array.from (flatten (times (3, _ => components))) }
 
 
 // Block base class
@@ -26,9 +16,9 @@ class Block {
 
 // Block types
 export default class Blocks {
-    static Dirt  = new Block (1, repeat ('#D68653', 12), repeat ('#E3A066', 12))
-    static Grass = new Block (2, ['#369940', '#369940', ...repeat ('#D68653', 10)],
-                                 ['#43B353', '#43B353', ...repeat ('#E3A066', 10)])
+    static Dirt  = new Block (1, times (12, _ => '#D68653'), times (12, _ => '#E3A066'))
+    static Grass = new Block (2, ['#369940', '#369940', ...times (10, _ => '#D68653')],
+                                 ['#43B353', '#43B353', ...times (10, _ => '#E3A066')])
 
     static All = pickBy (Blocks, value => value instanceof Block)
     static BlocksByID = fromPairs (map (Blocks.All, block => [block.ID, block]))

@@ -1,4 +1,4 @@
-import keyBy from 'lodash-es/keyBy'
+import { keyBy } from 'lodash-es'
 
 
 // Direction inner class

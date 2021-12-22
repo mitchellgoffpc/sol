@@ -1,7 +1,3 @@
-import map from 'lodash-es/map'
-import flatMap from 'lodash-es/flatMap'
-import forEach from 'lodash-es/forEach'
-
 import Blocks from 'blocks'
 import Directions from 'util/directions'
 import { getVerticesForSide } from 'util/geometry'

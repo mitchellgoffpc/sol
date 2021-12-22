@@ -1,16 +1,5 @@
 import * as Three from 'three'
-
-import map from 'lodash-es/map'
-import chunk from 'lodash-es/chunk'
-import first from 'lodash-es/first'
-import range from 'lodash-es/range'
-import filter from 'lodash-es/filter'
-import negate from 'lodash-es/negate'
-import values from 'lodash-es/values'
-import sortBy from 'lodash-es/sortBy'
-import flatMap from 'lodash-es/flatMap'
-import fromPairs from 'lodash-es/fromPairs'
-import mapValues from 'lodash-es/mapValues'
+import { map, chunk, first, range, filter, negate, values, sortBy, flatMap, fromPairs, mapValues } from 'lodash-es'
 
 import Entity from 'entities'
 import Chunk from 'world/chunk'
