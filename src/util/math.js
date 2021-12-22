@@ -1,4 +1,4 @@
-import { Vector2, Vector3 } from 'three'
+import { Vector3 } from 'three'
 
 
 // Math utility class

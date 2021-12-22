@@ -4,8 +4,7 @@ import uuid from 'uuid/v4'
 import Blocks from 'blocks'
 import Directions from 'util/directions'
 import { getVerticesForSide } from 'util/geometry'
-import { getBlockIndex,
-         getBlockIndexForPosition,
+import { getBlockIndexForPosition,
          getPositionForBlockIndex,
          positionIsWithinChunk } from 'util/coordinates'
 
@@ -68,7 +67,6 @@ export default class Chunk {
         this.refreshGeometry () }
 
     placeBlockOnFace (faceIndex, block) {
-        const vertexBuffer = this.mesh.geometry.attributes.position.array
         const position = getPositionForBlockIndex (this.blockIndicesForFaces[faceIndex])
         const faceDirection = Directions.All.find (direction => direction.index === Math.floor (this.BFBIndicesForFaces[faceIndex] / 2))
         this.placeBlock (faceDirection.getAdjacentPosition (position), block) }
@@ -151,7 +149,6 @@ export default class Chunk {
                     vertexBuffer.set (vertexBuffer.slice (faceIndexToMove * 9, faceIndexToMove * 9 + 9), faceIndex * 9)
                     colorBuffer.set  (colorBuffer.slice  (faceIndexToMove * 9, faceIndexToMove * 9 + 9), faceIndex * 9)
 
-                    const faceBFBOffset =  blockBFBOffset + this.BFBIndicesForFaces[faceIndex]
                     const blockIndexOfFaceToMove = this.blockIndicesForFaces[faceIndexToMove]
                     const BFBIndexOfFaceToMove = this.BFBIndicesForFaces[faceIndexToMove]
                     const BFBOffsetOfFaceToMove = this.BFBOffsetsForBlocks[blockIndexOfFaceToMove] + BFBIndexOfFaceToMove
@@ -227,7 +224,7 @@ export default class Chunk {
 
     // Create the vertex and color buffers for this chunk
 
-    createBufferGeometry (buffers, vertexBufferSize, blockFaceBufferSize) {
+    createBufferGeometry (buffers, vertexBufferSize) {
         this.blockFaceBuffer = buffers.blockFaceBuffer
         this.BFBIndicesForFaces = buffers.BFBIndicesForFaces
         this.BFBOffsetsForBlocks = buffers.BFBOffsetsForBlocks

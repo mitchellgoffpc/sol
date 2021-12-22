@@ -1,5 +1,3 @@
-import * as Three from 'three'
-
 import Machine from 'blocks/machines'
 import Pivot from 'blocks/geometry/pivot'
 import LinearConnection from 'physics/machinery/connections/linear'

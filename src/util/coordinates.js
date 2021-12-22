@@ -1,6 +1,3 @@
-import Directions from 'util/directions'
-
-
 // Helper functions for converting block indices into position objects and back
 
 export const getBlockIndex = (x, y, z) =>

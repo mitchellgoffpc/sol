@@ -1,5 +1,3 @@
-import * as Three from 'three'
-
 import Machine from 'blocks/machines'
 import Pivot from 'blocks/geometry/pivot'
 import LinearConnection from 'physics/machinery/connections/linear'
@@ -27,12 +25,12 @@ export default class Piston extends Machine {
 
         return builder.getMesh () }
 
-    getBaseForce = position => do {
+    getBaseForce = position => {
         if (!this.backstroke && position < 1)
-             this.force
+             return this.force
         else if (this.backstroke && position > 0.5)
-             -this.force
-        else 0 }
+             return -this.force
+        else return 0 }
 
     checkBasePosition = position =>
         position <= 1.5 && position >= 0

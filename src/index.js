@@ -1,8 +1,6 @@
 import "assets/index.css"
 
 import * as Three from 'three'
-import { map } from 'lodash-es'
-
 import Player from 'player'
 import World from 'world'
 import Directions from 'util/directions'
@@ -10,10 +8,7 @@ import Directions from 'util/directions'
 
 // Constants
 
-const UP = new Three.Vector3 (0, 1, 0)
-const DOWN = new Three.Vector3 (0, -1, 0)
 const ZERO = new Three.Vector3 (0, 0, 0)
-
 const KEY_INVENTORY = 69
 const KEY_DIRECTIONS = {
     16: Directions.DOWN.vector,
@@ -44,7 +39,7 @@ window.addEventListener("load", () => {
 
     const setPointerLock = lock => {
         if (lock && !controlsAreEnabled)
-            document.body.requestPointerLock () .catch (e => {})
+            document.body.requestPointerLock () .catch (_ => {})
         else if (!lock && controlsAreEnabled)
             document.exitPointerLock () }
 

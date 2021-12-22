@@ -1,10 +1,7 @@
-import * as Three from 'three'
-
 import Machine from 'blocks/machines'
 import Pivot from 'blocks/geometry/pivot'
 import LinearConnection from 'physics/machinery/connections/linear'
 import GeometryBuilder from 'util/geometry'
-import M from 'util/math'
 
 
 export default class WalkingBeam extends Machine {

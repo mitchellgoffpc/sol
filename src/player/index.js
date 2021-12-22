@@ -1,6 +1,4 @@
 import * as Three from 'three'
-import { map, range } from 'lodash-es'
-
 import Blocks from 'blocks'
 import Entity from 'entities'
 import M from 'util/math'
@@ -91,15 +89,14 @@ export default class Player {
 
     handleRefreshChunks = (previous, next) => {
         if (previous && !eq (previous, next)) {
-            console.log (next)
-            AXES.forEach (({ a, b, c }) => {
+            AXES.forEach (({ a, b }) => {
                 const dir = next[a] - previous[a] > 0 ? 1 : -1
                 const prevA = previous[a], prevB = previous[b]
 
-                process.nextTick(() => {
+                Promise.resolved().then(() => {
                     for (let i = prevA, limit = next[a]; dir > 0 ? i < limit : i > limit; i += dir) {
                         for (let j = prevB - RENDER_DISTANCE; j <= prevB + RENDER_DISTANCE; j++) {
-                            const positionsInBatch = range (-RENDER_DISTANCE - 1, RENDER_DISTANCE + 2)
+                            // const positionsInBatch = range (-RENDER_DISTANCE - 1, RENDER_DISTANCE + 2)
                             // this.world.loadChunks (positionsInBatch.map (k => ({ [a]: i + (RENDER_DISTANCE + 1) * dir, [b]: j, [c]: k })))
                             // this.world.unloadChunks (positionsInBatch.map (k => ({ [a]: i - (RENDER_DISTANCE + 1) * dir, [b]: j, [c]: k })))
                         }}})

@@ -1,5 +1,3 @@
-import * as Three from 'three'
-
 import Machine from 'blocks/machines'
 import Pivot from 'blocks/geometry/pivot'
 import LinearConnection from 'physics/machinery/connections/linear'
@@ -38,7 +36,7 @@ export default class Crank extends Machine {
 
         return builder.getMesh () }
 
-    getBaseForce = (position, velocity) => {
+    getBaseForce = () => {
         // const crankshaft = this.connections.crankshaft
         // const positionFromJoint = crankshaft.input (crankshaft.joint.position + crankshaft.joint.velocity)
         // const velocityFromJoint = positionFromJoint - crankshaft.input (crankshaft.joint.position)

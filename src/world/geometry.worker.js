@@ -30,12 +30,19 @@ const nextPowerOf2 = x => {
         power <<= 1 }
     return power }
 
-const getNeighborIndexForPosition = position => do {
+const getNeighborIndexForPosition = position => {
     if (position.x < 0 || position.x > 0xF)
-         position.y * 16 + position.z
+         return position.y * 16 + position.z
     else if (position.y < 0 || position.y > 0xF)
-         position.x * 16 + position.z
-    else position.x * 16 + position.y }
+         return position.x * 16 + position.z
+    else return position.x * 16 + position.y }
+
+const getAdjacentBlock = (blocks, neighborSide, adjacentPosition) => {
+    if (positionIsWithinChunk (adjacentPosition))
+         return blocks[getBlockIndexForPosition (adjacentPosition)]
+    else if (neighborSide)
+         return neighborSide[getNeighborIndexForPosition (adjacentPosition)]
+    else return 0 }
 
 
 // Attach the message listener
@@ -80,12 +87,7 @@ function createChunkGeometry ({ position, blocks, neighborSides }) {
             for (let i = 0; i < Directions.All.length; i++) {
                 const direction = Directions.All[i]
                 const adjacentPosition = direction.getAdjacentPosition (position)
-                const adjacentBlock = do {
-                    if (positionIsWithinChunk (adjacentPosition))
-                         blocks[getBlockIndexForPosition (adjacentPosition)]
-                    else if (neighborSides[i])
-                         neighborSides[i][getNeighborIndexForPosition (adjacentPosition)]
-                    else 0 }
+                const adjacentBlock = getAdjacentBlock (blocks, neighborSides[i], adjacentPosition)
 
                 if (!adjacentBlock) {
                     for (let j = 0; j < 2; j++) { // Loop twice because we need two faces per side

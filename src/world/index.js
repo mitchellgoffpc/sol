@@ -1,13 +1,10 @@
 import * as Three from 'three'
-import { map, chunk, first, range, filter, negate, values, sortBy, flatMap, fromPairs, mapValues } from 'lodash-es'
+import { first, range, filter, negate, sortBy } from 'lodash-es'
 
-import Entity from 'entities'
 import Chunk from 'world/chunk'
 import TerrainWorker from 'world/terrain.worker'
 import GeometryWorker from 'world/geometry.worker'
 import MachineryEngine from 'physics/machinery/engine'
-
-import Shapes from 'util/shapes'
 import Directions from 'util/directions'
 
 const RENDER_DISTANCE = 20
@@ -188,7 +185,7 @@ export default class World {
 
     // Update method
 
-    step (dt) {
+    step (_) {
         // this.physics.step (dt)
     }
 

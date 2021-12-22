@@ -1,7 +1,5 @@
-import Machine from 'blocks/machines'
+import { id, isFunction } from 'lodash-es'
 import Joint from 'physics/machinery/joints'
-
-const id = x => x
 
 
 export default class Connection {
@@ -18,10 +16,10 @@ export default class Connection {
         this.output = output
         this.massMultiplier = massMultiplier
         this.accMultiplier = () => {
-            const invert = _.isFunction (accelerationInverted) ? accelerationInverted () : accelerationInverted
+            const invert = isFunction (accelerationInverted) ? accelerationInverted () : accelerationInverted
             return this.massMultiplier () * (invert ? -1 : 1) }}
 
-    getEffectiveMass (connection) { return 1 }
+    getEffectiveMass () { return 1 }
 
     getAcceleration (connection) {
         if (connection === this.machine)

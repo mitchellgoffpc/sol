@@ -131,7 +131,7 @@ export default class PhysicsEngine {
 
     // API method for performing a single physics step
 
-    step = dt => {
+    step = () => {
         const gl = this.renderer.getContext ()
 
         // First, we'll check if the previous physics update is ready to be processed
@@ -153,7 +153,7 @@ export default class PhysicsEngine {
 
                     const { uuid, mesh, velocity, cameraRotation } = this.entities[i]
                     const speed = velocity.length ()
-                    const movementVector = velocity.clone () .normalize ()
+                    // const movementVector = velocity.clone () .normalize ()
                     const distanceToCollision = minDepth * MAX_COLLISION_DEPTH
                     const boundingSphereRadius = mesh.geometry.boundingSphere.radius
 
@@ -234,8 +234,10 @@ export default class PhysicsEngine {
 
     // Helper methods
 
-    entityNeedsUpdate = ({ velocity: { x, y, z }}) => true
+    // entityNeedsUpdate = ({ velocity: { x, y, z }}) =>
         // x !== 0 || y !== 0 || z !== 0
+
+    entityNeedsUpdate = () => true
 
     createRenderTarget () {
         const target = new Three.WebGLRenderTarget (32, 32, { stencilBuffer: false, format: Three.RGBFormat })

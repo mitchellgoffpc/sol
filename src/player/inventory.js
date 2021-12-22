@@ -1,4 +1,4 @@
-import { times, fill } from 'lodash-es'
+import { times } from 'lodash-es'
 
 function createElement (tag, className, attributes = {}) {
     let element = document.createElement(tag)
