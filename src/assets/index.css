@@ -77,3 +77,12 @@ canvas {
 
 .active-icon {
     pointer-events: none; }
+
+.icon .count,
+.active-icon .count {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    color: #FFF;
+    font-size: 14px;
+    font-weight: bold; }
