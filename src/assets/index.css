@@ -59,10 +59,14 @@ canvas {
 
 #inventory-window .column,
 #inventory-quickbar .column {
+    position: relative;
     width: 46px;
     height: 46px;
-    margin: 2px;
+    border: 2px solid #999;
     background-color: #CCC; }
+
+#inventory-quickbar .column.active {
+    background-color: #DDD; }
 
 #inventory-window .icon,
 #inventory-quickbar .icon,

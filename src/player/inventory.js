@@ -4,11 +4,12 @@ const STACK_SIZE = 64
 
 // Helper functions
 
-function createElement (tag, className, attributes = {}) {
+function createElement (tag, classNames, attributes = {}) {
     let element = document.createElement(tag)
-    element.classList.add(className)
-    for (let attribute in attributes) {
-        element.setAttribute(attribute, attributes[attribute]) }
+    for (let className of classNames.split(' '))
+        element.classList.add(className)
+    for (let attribute in attributes)
+        element.setAttribute(attribute, attributes[attribute])
     return element }
 
 function createIcon (item, x, y, slotId = -1) {
@@ -22,19 +23,20 @@ function createIcon (item, x, y, slotId = -1) {
     return icon }
 
 function createIconInSlot (slotId, item) {
-    let left = 10 + 25 + 50 * (slotId % 10)
-    let top = 10 + 25 + 50 * Math.floor(slotId / 10)
+    let left = 25 + 50 * (slotId % 10) + (slotId < 10 ? 0 : 10)
+    let top = slotId < 10 ? 25 : 10 + 25 + 50 * Math.floor(slotId / 10 - 1)
     return createIcon (item, left, top, slotId) }
 
 
 // Player inventory class
 
 export default class PlayerInventory {
-    slots = times (10 * 4, _ => null)
+    slots = times (10 * 5, _ => null)
+    activeQuickbarSlot = 0
     current = null
 
     constructor () {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 10; i < 20; i++) {
             this.slots[i] = { id: 'grass', count: 16 }}
 
         this.window = document.getElementById ('inventory-window')
@@ -50,11 +52,13 @@ export default class PlayerInventory {
         if (show) {
             this.drawInventoryWindow ()
             this.window.addEventListener ("mousedown", this.handleClickWindow)
+            this.quickbar.addEventListener ("mousedown", this.handleClickWindow)
             window.addEventListener ("mousemove", this.handleMouseMove)
             this.window.style.display = 'block' }
         else {
             this.window.style.display = 'none'
             this.window.removeEventListener ("mousedown", this.handleClickWindow)
+            this.quickbar.removeEventListener ("mousedown", this.handleClickWindow)
             window.removeEventListener ("mousemove", this.handleMouseMove)
             this.clearInventoryWindow () }}
 
@@ -90,6 +94,9 @@ export default class PlayerInventory {
             this.current.icon.style.left = `${event.pageX}px`
             this.current.icon.style.top = `${event.pageY}px` }}
 
+    handleSetQuickbarSlot = event => {
+        this.setActiveQuickbarSlot (event.which - 49 + (event.which < 49 ? 10 : 0)) }
+
 
     // Helper functions
 
@@ -103,11 +110,18 @@ export default class PlayerInventory {
 
     setSlot = (slotId, item) => {
         this.slots[slotId] = item
-        let currentSlotIcon = this.window.querySelector (`.icon[slot-id="${slotId}"]`)
+        let container = slotId < 10 ? this.quickbar : this.window
+        let currentSlotIcon = container.querySelector (`.icon[slot-id="${slotId}"]`)
         if (currentSlotIcon)
-            this.window.removeChild (currentSlotIcon)
+            container.removeChild (currentSlotIcon)
         if (item)
-            this.window.appendChild (createIconInSlot (slotId, item)) }
+            container.appendChild (createIconInSlot (slotId, item)) }
+
+    setActiveQuickbarSlot = slotId => {
+        this.activeQuickbarSlot = slotId
+        for (let child of this.quickbar.children)
+            child.classList.remove ('active')
+        this.quickbar.children[slotId].classList.add ('active') }
 
 
     // Drawing functions
@@ -116,7 +130,7 @@ export default class PlayerInventory {
         for (let i = 0; i < 4; i++) {
             let row = createElement ('div', 'row')
             for (let j = 0; j < 10; j++) {
-                row.appendChild (createElement ('div', 'column', { 'slot-id': i*10 + j })) }
+                row.appendChild (createElement ('div', 'column', { 'slot-id': i*10 + j + 10 })) }
             this.window.appendChild (row) }
 
         for (let i = 0; i < this.slots.length; i++) {
@@ -131,5 +145,6 @@ export default class PlayerInventory {
             this.window.removeChild (this.window.firstChild) }}
 
     drawInventoryQuickbar = () => {
-        for (let j = 0; j < 10; j++) {
-            this.quickbar.appendChild (createElement ('div', 'column', { 'slot-id': j })) }}}
+        for (let i = 0; i < 10; i++) {
+            let className = i === this.activeQuickbarSlot ? 'column active' : 'column'
+            this.quickbar.appendChild (createElement ('div', className, { 'slot-id': i })) }}}

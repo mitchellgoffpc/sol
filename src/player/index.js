@@ -61,6 +61,7 @@ export default class Player {
     // Event handlers
 
     handleShowInventory = this.inventory.handleShowWindow
+    handleSetQuickbarSlot = this.inventory.handleSetQuickbarSlot
 
     handleUpdateRotation = (movementX, movementY) => {
         let rx = this.rotation.x - movementX / 500

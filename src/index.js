@@ -4,12 +4,14 @@ import * as Three from 'three'
 import Player from 'player'
 import World from 'world'
 import Directions from 'util/directions'
+import { range } from 'lodash'
 
 
 // Constants
 
 const ZERO = new Three.Vector3 (0, 0, 0)
 const KEY_INVENTORY = 69
+const KEY_QUICKBAR = range (48, 58)
 const KEY_DIRECTIONS = {
     16: Directions.DOWN.vector,
     32: Directions.UP.vector,
@@ -73,8 +75,10 @@ window.addEventListener("load", () => {
             player.handleUpdateRotation (event.movementX, event.movementY) }})
 
     document.addEventListener ("keydown", event => {
-        if (event.which in KEY_DIRECTIONS && controlsAreEnabled) {
-            activeKeys.add (event.which) }
+        if (event.which in KEY_DIRECTIONS && controlsAreEnabled)
+            activeKeys.add (event.which)
+        else if (KEY_QUICKBAR.includes(event.which))
+            player.handleSetQuickbarSlot (event)
         else if (event.which === KEY_INVENTORY) {
             setPointerLock (!controlsAreEnabled)
             player.handleShowInventory (controlsAreEnabled) }})
