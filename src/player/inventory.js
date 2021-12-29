@@ -1,5 +1,7 @@
 import { times } from 'lodash'
 
+const STACK_SIZE = 64
+
 // Helper functions
 
 function createElement (tag, className, attributes = {}) {
@@ -74,11 +76,14 @@ export default class PlayerInventory {
             this.setCurrentItem (null) }
         else if (this.current.item.id !== this.slots[slotId].id) { // Swap with the slot
             let currentItem = this.current.item
-            this.setCurrentItem (this.slots[slotId], event.pageX, event.pageY, slotId)
+            this.setCurrentItem (this.slots[slotId], event.pageX, event.pageY, this.current.slotId)
             this.setSlot (slotId, currentItem) }
-        else { // Grab and merge from slot
-
-        }}
+        else { // Place as many as possible into slot
+            let placeCount = Math.min(STACK_SIZE - this.slots[slotId].count, this.current.item.count)
+            let newCurrentItem = { ...this.current.item, count: this.current.item.count - placeCount }
+            let newSlotItem = { ...this.slots[slotId], count: this.slots[slotId].count + placeCount }
+            this.setCurrentItem (newCurrentItem.count > 0 ? newCurrentItem : null, event.pageX, event.pageY, this.current.slotId)
+            this.setSlot (slotId, newSlotItem) }}
 
     handleMouseMove = event => {
         if (this.current) {
