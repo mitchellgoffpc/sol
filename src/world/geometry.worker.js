@@ -73,6 +73,11 @@ function createChunkGeometryForBatch ({ chunks }) {
 function createChunkGeometry ({ position, blocks, neighborSides }) {
     let vertexIndex = 0
     let BFBIndex = 0
+
+    blockFaceBuffer.fill (-1)
+    blockIndicesForFaces.fill (-1)
+    blockIndicesForBFBOffsets.fill (-1)
+    BFBIndicesForFaces.fill (-1)
     BFBOffsetsForBlocks.fill (-1)
 
     // Loop over all the blocks in this chunk

@@ -41,6 +41,7 @@ export default class Directions {
           [Directions.EAST]:  Directions.WEST }
 
     static ByName = keyBy (Directions.All, 'name')
+    static ByIndex = keyBy (Directions.All, 'index')
 
     static getAdjacentPositions = position =>
         Directions.All.map (direction => ({ direction, adjacentPosition: direction.getAdjacentPosition (position) }))

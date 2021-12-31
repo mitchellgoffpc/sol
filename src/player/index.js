@@ -4,6 +4,7 @@ import Entity from 'entities'
 import M from 'util/math'
 import Shapes from 'util/shapes'
 import PlayerInventory from 'player/inventory'
+import { getBlockIndexForPosition } from 'util/coordinates'
 
 
 // Constants
@@ -75,18 +76,18 @@ export default class Player {
         this.camera.updateProjectionMatrix () }
 
     handleHighlightCrosshairTarget = (previous, next) => {
-        if (next && (!previous || !eq (next, previous))) {
-            this.world.setBlockHighlight (next, true) }
-        if (previous && (!next || !eq (next, previous))) {
-            this.world.setBlockHighlight (previous, false) }}
+        if (next && (!previous || !eq (next.position, previous.position))) {
+            this.world.setBlockHighlight (next.position, true) }
+        if (previous && (!next || !eq (next.position, previous.position))) {
+            this.world.setBlockHighlight (previous.position, false) }}
 
     handlePlaceBlock = () => {
         const target = this.currentCrosshairTarget
-        if (target) this.world.placeBlockOnChunkFace (target.object.position, target.faceIndex, Blocks.Grass) }
+        if (target) this.world.placeBlock (target.direction.getAdjacentPosition (target.position), Blocks.Grass) }
 
     handleDestroyBlock = () => {
         const target = this.currentCrosshairTarget
-        if (target) this.world.destroyBlockWithFace (target.object.position, target.faceIndex) }
+        if (target) this.world.destroyBlock (target.position) }
 
     handleRefreshChunks = (previous, next) => {
         if (previous && !eq (previous, next)) {
@@ -116,9 +117,9 @@ export default class Player {
         this.camera.lookAt (this.camera.position.clone () .add (this.gaze))
 
         // // Update the crosshair target
-        // const newCrosshairTarget = this.getBlockPositionForCrosshairTarget ()
-        // this.handleHighlightCrosshairTarget (this.currentCrosshairTarget, newCrosshairTarget)
-        // this.currentCrosshairTarget = newCrosshairTarget
+        const newCrosshairTarget = this.getCrosshairTarget ()
+        this.handleHighlightCrosshairTarget (this.currentCrosshairTarget, newCrosshairTarget)
+        this.currentCrosshairTarget = newCrosshairTarget
 
         // // Update the surrounding chunks
         // const newChunkPosition = getChunkPosition (this.position)
@@ -129,8 +130,8 @@ export default class Player {
 
     // Helper methods
 
-    getBlockPositionForCrosshairTarget () {
+    getCrosshairTarget () {
         const target = this.world.getClosestIntersection (this.position, this.gaze)
         if (target && target.distance < 10 && target.object.name === "CHUNK")
-             return this.world.getBlockPositionForFaceIndex (target.object.position, target.faceIndex)
+             return this.world.getPositionAndDirectionForFaceIndex (target.object.position, target.faceIndex)
         else return null }}

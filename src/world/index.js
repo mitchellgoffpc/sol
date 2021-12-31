@@ -73,9 +73,6 @@ export default class World {
     placeBlock (position, block) {
         this.withChunk (position, (chunk, chunkPos) => chunk.placeBlock (chunkPos, block)) }
 
-    placeBlockOnChunkFace (position, faceIndex, block) {
-        this.withChunk (position, chunk => chunk.placeBlockOnFace (faceIndex, block)) }
-
     placeMachine (position, machine) {
         // this.placeBlock (position, machine)
         machine.mesh.position.set (position.x, position.y, position.z)
@@ -98,9 +95,6 @@ export default class World {
 
     destroyBlock (position) {
         this.withChunk (position, (chunk, chunkPos) => chunk.destroyBlock (chunkPos)) }
-
-    destroyBlockWithFace (position, faceIndex) {
-        this.withChunk (position, chunk => chunk.destroyBlockWithFace (faceIndex)) }
 
     destroyEntity (entity) {
         this.scene.remove (entity.mesh)
@@ -221,8 +215,13 @@ export default class World {
     getBlockAtPosition = position =>
         this.withChunk (position, (chunk, chunkPos) => chunk.getBlockAtPosition (chunkPos)) || 0
 
-    getBlockPositionForFaceIndex = (position, faceIndex) =>
-        this.withChunk (position, chunk => chunk.getWorldPosFromChunkPos (chunk.getBlockPositionForFaceIndex (faceIndex)))
+    getPositionForFaceIndex = (position, faceIndex) =>
+        this.withChunk (position, chunk => chunk.getWorldPosFromChunkPos (chunk.getPositionForFaceIndex (faceIndex)))
+
+    getPositionAndDirectionForFaceIndex = (position, faceIndex) =>
+        this.withChunk (position, chunk => ({
+            position: chunk.getWorldPosFromChunkPos (chunk.getPositionForFaceIndex (faceIndex)),
+            direction: chunk.getDirectionForFaceIndex (faceIndex) }))
 
     getIntersections = (position, direction) => {
         this.raycaster.set (position, direction)

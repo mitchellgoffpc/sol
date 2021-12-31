@@ -66,11 +66,6 @@ export default class Chunk {
 
         this.refreshGeometry () }
 
-    placeBlockOnFace (faceIndex, block) {
-        const position = getPositionForBlockIndex (this.blockIndicesForFaces[faceIndex])
-        const faceDirection = Directions.All.find (direction => direction.index === Math.floor (this.BFBIndicesForFaces[faceIndex] / 2))
-        this.placeBlock (faceDirection.getAdjacentPosition (position), block) }
-
     placeLight (position, intensity = 1.0) {
         const { x: wx, y: wy, z: wz } = this.getWorldPosFromChunkPos (position)
         const light = new Three.PointLight (0xFFFFFF, intensity)
@@ -100,9 +95,6 @@ export default class Chunk {
         this.blocks[getBlockIndexForPosition (position)] = 0
         this.refreshGeometry () }
 
-    destroyBlockWithFace (faceIndex) {
-        this.destroyBlock (getPositionForBlockIndex (this.blockIndicesForFaces[faceIndex])) }
-
 
     // Methods for adding and removing block faces
 
@@ -114,7 +106,7 @@ export default class Chunk {
         // If this block doesn't have any visible faces, allocate some new space in the BFB
         if (this.BFBOffsetsForBlocks[blockIndex] === -1) {
             this.BFBOffsetsForBlocks[blockIndex] = this.blockFaceBufferSize
-            // this.blockIndicesForBFBOffsets[this.blockFaceBufferSize / 12] = blockIndex
+            this.blockIndicesForBFBOffsets[this.blockFaceBufferSize / 12] = blockIndex
             this.blockFaceBufferSize += 12 }
 
         const blockBFBOffset = this.BFBOffsetsForBlocks[blockIndex]
@@ -125,7 +117,7 @@ export default class Chunk {
             this.blockFaceBuffer[blockBFBOffset + faceBFBIndex] = faceIndex
             this.BFBIndicesForFaces[faceIndex] = faceBFBIndex
             this.blockIndicesForFaces[faceIndex] = blockIndex
-            this.mesh.geometry.attributes.color.array.set (colorData[faceBFBIndex], faceIndex * 9) }
+            this.mesh.geometry.attributes.color.array.set (colorData[faceBFBIndex], vertices * 3 + i * 3) }
 
         this.mesh.geometry.attributes.position.array.set (getVerticesForSide (position, direction), vertices * 3)
         this.mesh.geometry.setDrawRange (0, vertices + 6) }
@@ -212,8 +204,11 @@ export default class Chunk {
     getBlockAtPosition (position) {
         return this.blocks ? this.blocks[getBlockIndexForPosition (position)] : 0 }
 
-    getBlockPositionForFaceIndex (faceIndex) {
+    getPositionForFaceIndex (faceIndex) {
         return getPositionForBlockIndex (this.blockIndicesForFaces[faceIndex]) }
+
+    getDirectionForFaceIndex (faceIndex) {
+        return Directions.ByIndex[Math.floor (this.BFBIndicesForFaces[faceIndex] / 2)] }
 
     getChunkPosFromWorldPos ({ x, y, z }) {
         return { x: x - this.position.x * 16, y: y - this.position.y * 16, z: z - this.position.z * 16 }}
@@ -224,12 +219,13 @@ export default class Chunk {
 
     // Create the vertex and color buffers for this chunk
 
-    createBufferGeometry (buffers, vertexBufferSize) {
+    createBufferGeometry (buffers, vertexBufferSize, blockFaceBufferSize) {
         this.blockFaceBuffer = buffers.blockFaceBuffer
         this.BFBIndicesForFaces = buffers.BFBIndicesForFaces
         this.BFBOffsetsForBlocks = buffers.BFBOffsetsForBlocks
         this.blockIndicesForFaces = buffers.blockIndicesForFaces
         this.blockIndicesForBFBOffsets = buffers.blockIndicesForBFBOffsets
+        this.blockFaceBufferSize = blockFaceBufferSize
 
         const geometry = new Three.BufferGeometry ()
         const material = new Three.MeshLambertMaterial ({ vertexColors: Three.VertexColors })
