@@ -83,11 +83,15 @@ export default class Player {
 
     handlePlaceBlock = () => {
         const target = this.currentCrosshairTarget
-        if (target) this.world.placeBlock (target.direction.getAdjacentPosition (target.position), Blocks.Grass) }
+        const activeItem = this.inventory.getActiveItem ()
+        if (target && activeItem) {
+            this.world.placeBlock (target.direction.getAdjacentPosition (target.position), Blocks.fromBlockID(activeItem.id))
+            this.inventory.setSlotCount (this.inventory.activeQuickbarSlot, activeItem.count - 1) }}
 
     handleDestroyBlock = () => {
         const target = this.currentCrosshairTarget
-        if (target) this.world.destroyBlock (target.position) }
+        if (target)
+            this.world.destroyBlock (target.position) }
 
     handleRefreshChunks = (previous, next) => {
         if (previous && !eq (previous, next)) {

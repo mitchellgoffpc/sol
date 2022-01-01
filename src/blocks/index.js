@@ -21,7 +21,7 @@ export default class Blocks {
                                  ['#43B353', '#43B353', ...times (10, _ => '#E3A066')])
 
     static All = pickBy (Blocks, value => value instanceof Block)
-    static BlocksByID = fromPairs (map (Blocks.All, block => [block.ID, block]))
+    static ByID = fromPairs (map (Blocks.All, block => [block.ID, block]))
 
     static fromBlockID (ID) {
-        return Blocks.BlocksByID[ID] }}
+        return Blocks.ByID[ID] }}

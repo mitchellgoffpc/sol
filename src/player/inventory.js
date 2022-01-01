@@ -33,11 +33,13 @@ function createIconInSlot (slotId, item) {
 export default class PlayerInventory {
     slots = times (10 * 5, _ => null)
     activeQuickbarSlot = 0
-    current = null
+    grabbed = null
 
     constructor () {
-        for (let i = 10; i < 20; i++) {
-            this.slots[i] = { id: 'grass', count: 16 }}
+        for (let i = 10; i < 20; i += 2)
+            this.slots[i] = { id: 2, count: 16 }
+        for (let i = 11; i < 20; i += 2)
+            this.slots[i] = { id: 1, count: 16 }
 
         this.window = document.getElementById ('inventory-window')
         this.quickbar = document.getElementById ('inventory-quickbar')
@@ -72,27 +74,27 @@ export default class PlayerInventory {
             return
         let slotId = parseInt (e.getAttribute ('slot-id'))
 
-        if (!this.current) { // Grab from the slot
-            this.setCurrentItem (this.slots[slotId], event.pageX, event.pageY, slotId)
+        if (!this.grabbed) { // Grab from the slot
+            this.setGrabbedItem (this.slots[slotId], event.pageX, event.pageY, slotId)
             this.setSlot (slotId, null) }
         else if (!this.slots[slotId]) { // Place in the slot
-            this.setSlot (slotId, this.current.item)
-            this.setCurrentItem (null) }
-        else if (this.current.item.id !== this.slots[slotId].id) { // Swap with the slot
-            let currentItem = this.current.item
-            this.setCurrentItem (this.slots[slotId], event.pageX, event.pageY, this.current.slotId)
-            this.setSlot (slotId, currentItem) }
+            this.setSlot (slotId, this.grabbed.item)
+            this.setGrabbedItem (null) }
+        else if (this.grabbed.item.id !== this.slots[slotId].id) { // Swap with the slot
+            let grabbedItem = this.grabbed.item
+            this.setGrabbedItem (this.slots[slotId], event.pageX, event.pageY, this.grabbed.slotId)
+            this.setSlot (slotId, grabbedItem) }
         else { // Place as many as possible into slot
-            let placeCount = Math.min(STACK_SIZE - this.slots[slotId].count, this.current.item.count)
-            let newCurrentItem = { ...this.current.item, count: this.current.item.count - placeCount }
+            let placeCount = Math.min(STACK_SIZE - this.slots[slotId].count, this.grabbed.item.count)
+            let newCurrentItem = { ...this.grabbed.item, count: this.grabbed.item.count - placeCount }
             let newSlotItem = { ...this.slots[slotId], count: this.slots[slotId].count + placeCount }
-            this.setCurrentItem (newCurrentItem.count > 0 ? newCurrentItem : null, event.pageX, event.pageY, this.current.slotId)
+            this.setGrabbedItem (newCurrentItem.count > 0 ? newCurrentItem : null, event.pageX, event.pageY, this.grabbed.slotId)
             this.setSlot (slotId, newSlotItem) }}
 
     handleMouseMove = event => {
-        if (this.current) {
-            this.current.icon.style.left = `${event.pageX}px`
-            this.current.icon.style.top = `${event.pageY}px` }}
+        if (this.grabbed) {
+            this.grabbed.icon.style.left = `${event.pageX}px`
+            this.grabbed.icon.style.top = `${event.pageY}px` }}
 
     handleSetQuickbarSlot = event => {
         this.setActiveQuickbarSlot (event.which - 49 + (event.which < 49 ? 10 : 0)) }
@@ -100,22 +102,25 @@ export default class PlayerInventory {
 
     // Helper functions
 
-    setCurrentItem = (item, x, y, slotId) => {
-        if (this.current) {
-            document.body.removeChild (this.current.icon)
-            this.current = null }
+    getActiveItem = () => this.slots[this.activeQuickbarSlot]
+
+    setGrabbedItem = (item, x, y, slotId) => {
+        if (this.grabbed) {
+            document.body.removeChild (this.grabbed.icon)
+            this.grabbed = null }
         if (item) {
-            this.current = { item, slotId, icon: createIcon (item, x, y) }
-            document.body.appendChild (this.current.icon) }}
+            this.grabbed = { item, slotId, icon: createIcon (item, x, y) }
+            document.body.appendChild (this.grabbed.icon) }}
 
     setSlot = (slotId, item) => {
         this.slots[slotId] = item
-        let container = slotId < 10 ? this.quickbar : this.window
-        let currentSlotIcon = container.querySelector (`.icon[slot-id="${slotId}"]`)
-        if (currentSlotIcon)
-            container.removeChild (currentSlotIcon)
-        if (item)
-            container.appendChild (createIconInSlot (slotId, item)) }
+        this.drawSlot (slotId) }
+
+    setSlotCount = (slotId, count) => {
+        if (count > 0)
+             this.slots[slotId].count = count
+        else this.slots[slotId] = null
+        this.drawSlot (slotId) }
 
     setActiveQuickbarSlot = slotId => {
         this.activeQuickbarSlot = slotId
@@ -138,13 +143,21 @@ export default class PlayerInventory {
                 this.window.appendChild (createIconInSlot (i, this.slots[i])) }}}
 
     clearInventoryWindow = () => {
-        if (this.current) {
-            this.setSlot (this.current.slotId, this.current.item)
-            this.setCurrentItem (null) }
+        if (this.grabbed) {
+            this.setSlot (this.grabbed.slotId, this.grabbed.item)
+            this.setGrabbedItem (null) }
         while (this.window.firstChild) {
             this.window.removeChild (this.window.firstChild) }}
 
     drawInventoryQuickbar = () => {
         for (let i = 0; i < 10; i++) {
             let className = i === this.activeQuickbarSlot ? 'column active' : 'column'
-            this.quickbar.appendChild (createElement ('div', className, { 'slot-id': i })) }}}
+            this.quickbar.appendChild (createElement ('div', className, { 'slot-id': i })) }}
+
+    drawSlot = slotId => {
+        let container = slotId < 10 ? this.quickbar : this.window
+        let currentSlotIcon = container.querySelector (`.icon[slot-id="${slotId}"]`)
+        if (currentSlotIcon)
+            container.removeChild (currentSlotIcon)
+        if (this.slots[slotId])
+            container.appendChild (createIconInSlot (slotId, this.slots[slotId])) }}
