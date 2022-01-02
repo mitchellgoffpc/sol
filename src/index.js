@@ -1,4 +1,5 @@
-import "assets/index.css"
+import 'assets/index.css'
+import 'util/extensions'
 
 import * as Three from 'three'
 import Player from 'player'

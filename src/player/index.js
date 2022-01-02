@@ -1,7 +1,6 @@
 import * as Three from 'three'
 import Blocks from 'blocks'
 import Entity from 'entities'
-import M from 'util/math'
 import Shapes from 'util/shapes'
 import PlayerInventory from 'player/inventory'
 
@@ -9,7 +8,7 @@ import PlayerInventory from 'player/inventory'
 // Constants
 
 const UP               = new Three.Vector3 (0, 1, 0)
-const INITIAL_POSITION = new Three.Vector3 (8, 48, 12)
+const INITIAL_POSITION = new Three.Vector3 (8, 47, 12)
 const INITIAL_ROTATION = new Three.Vector2 (Math.PI, 0)
 
 const RENDER_DISTANCE = 20
@@ -17,6 +16,11 @@ const AXES = [
     { a: 'x', b: 'z', c: 'y' },
     { a: 'z', b: 'x', c: 'y' },
     { a: 'y', b: 'x', c: 'z' }]
+
+const getDirectionVector = rotation =>
+    new Three.Vector3 (-Math.sin (rotation.x) * Math.cos (rotation.y),
+                 -Math.sin (rotation.y),
+                 -Math.cos (rotation.x) * Math.cos (rotation.y))
 
 const getRotatedMovementVector = (movement, rotation) =>
     movement.clone () .applyAxisAngle (UP, rotation.x) .normalize ()
@@ -45,7 +49,7 @@ class PlayerEntity extends Entity {
 export default class Player {
     position = INITIAL_POSITION.clone ()
     rotation = INITIAL_ROTATION.clone ()
-    gaze = M.getDirectionVector (INITIAL_ROTATION)
+    gaze = getDirectionVector (INITIAL_ROTATION)
     currentChunkPosition = getChunkPosition (INITIAL_POSITION)
     currentCrosshairTarget = null
 
@@ -55,7 +59,7 @@ export default class Player {
 
     constructor (world) {
         this.world = world
-        this.world.spawnEntity (this.position, this.playerEntity) }
+        this.world.spawnEntity (this.position.clone () .addY (-0.8), this.playerEntity) }
 
 
     // Event handlers
@@ -67,8 +71,8 @@ export default class Player {
         let rx = this.rotation.x - movementX / 500
         let ry = this.rotation.y + movementY / 500
         this.rotation.x = rx % (Math.PI * 2)
-        this.rotation.y = M.clamp (ry, -Math.PI / 2 + 0.0001, Math.PI / 2 - 0.0001)
-        this.gaze = M.getDirectionVector (this.rotation) }
+        this.rotation.y = Math.clamp (ry, -Math.PI / 2 + 0.0001, Math.PI / 2 - 0.0001)
+        this.gaze = getDirectionVector (this.rotation) }
 
     handleResizeCamera = (width, height) => {
         this.camera.aspect = width / height
@@ -111,9 +115,9 @@ export default class Player {
 
     // Update handler method
 
-    step (dt, movement) {
+    step (dt, desiredMovement) {
         // Update our position
-        this.position.addScaledVector (getRotatedMovementVector (movement, this.rotation), dt / 120)
+        this.position.add (this.getValidMovement (getRotatedMovementVector (desiredMovement, this.rotation) .multiplyScalar (dt / 120)))
 
         // Update the camera's position and rotation
         this.camera.position.set (this.position.x, this.position.y, this.position.z)
@@ -133,8 +137,34 @@ export default class Player {
 
     // Helper methods
 
+    getBlockPositionAtOffset = (x, y, z) =>
+        new Three.Vector3 (x, y, z) .add (this.position) .floor ()
+
     getCrosshairTarget () {
         const target = this.world.getClosestIntersection (this.position, this.gaze)
         if (target && target.distance < 10 && target.object.name === "CHUNK")
              return this.world.getPositionAndDirectionForFaceIndex (target.object.position, target.faceIndex)
-        else return null }}
+        else return null }
+
+    getValidMovement (movement) {
+        // Floor collision check
+        for (let x = -.5; x < 1; x++) {
+            for (let z = -.5; z < 1; z++) {
+                if (this.world.getBlockAtPosition (this.getBlockPositionAtOffset (x, -1.8 + movement.y, z))) {
+                    movement.y = Math.max (0, movement.y) }}}
+
+        // X collision check
+        if (movement.x !== 0) {
+            for (let y = -1.8; y < 1; y++) {
+                for (let z = -.5; z < 1; z++) {
+                    if (this.world.getBlockAtPosition (this.getBlockPositionAtOffset (0.5 * Math.sign (movement.x) + movement.x, y, z))) {
+                        movement.x = 0 }}}}
+
+        // Z collision check
+        if (movement.z !== 0) {
+            for (let y = -1.8; y < 1; y++) {
+                for (let x = -.5; x < 1; x++) {
+                    if (this.world.getBlockAtPosition (this.getBlockPositionAtOffset (x, y, 0.5 * Math.sign (movement.z) + movement.z))) {
+                        movement.z = 0 }}}}
+
+        return movement }}
