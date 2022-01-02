@@ -4,7 +4,6 @@ import Entity from 'entities'
 import M from 'util/math'
 import Shapes from 'util/shapes'
 import PlayerInventory from 'player/inventory'
-import { getBlockIndexForPosition } from 'util/coordinates'
 
 
 // Constants

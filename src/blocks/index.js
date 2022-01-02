@@ -1,9 +1,9 @@
+import { hexToRgb } from 'util/colors'
 import { map, chunk, times, flatten, fromPairs, pickBy } from 'lodash'
 
 // Helper functions
 const hexToFloats = hexCode => {
-    let components = chunk (hexCode.substr (1), 2) .map (x => parseInt (x.join (''), 16) / 0xFF)
-    return Float32Array.from (flatten (times (3, _ => components))) }
+    return Float32Array.from (flatten (times (3, _ => hexToRgb (hexCode)))) }
 
 
 // Block base class

@@ -76,7 +76,6 @@ canvas {
     width: 20px;
     height: 20px;
     transform: translate(-50%, -50%);
-    background-color: green;
     cursor: pointer; }
 
 .active-icon {

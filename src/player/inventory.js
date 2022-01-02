@@ -1,3 +1,5 @@
+import Blocks from 'blocks'
+import { rgbToHex } from 'util/colors'
 import { times } from 'lodash'
 
 const STACK_SIZE = 64
@@ -16,6 +18,7 @@ function createIcon (item, x, y, slotId = -1) {
     let icon = slotId > -1 ? createElement ('div', 'icon', { 'slot-id': slotId }) : createElement ('div', 'active-icon')
     icon.style.left = `${x}px`
     icon.style.top = `${y}px`
+    icon.style.backgroundColor = rgbToHex (Blocks.fromBlockID (item.id) .colorData[0].slice (0, 3))
     if (item.count > 1) {
         let count = createElement ('div', 'count')
         count.innerHTML = item.count
@@ -36,9 +39,9 @@ export default class PlayerInventory {
     grabbed = null
 
     constructor () {
-        for (let i = 10; i < 20; i += 2)
+        for (let i = 0; i < 10; i += 2)
             this.slots[i] = { id: 2, count: 16 }
-        for (let i = 11; i < 20; i += 2)
+        for (let i = 1; i < 10; i += 2)
             this.slots[i] = { id: 1, count: 16 }
 
         this.window = document.getElementById ('inventory-window')
@@ -138,7 +141,7 @@ export default class PlayerInventory {
                 row.appendChild (createElement ('div', 'column', { 'slot-id': i*10 + j + 10 })) }
             this.window.appendChild (row) }
 
-        for (let i = 0; i < this.slots.length; i++) {
+        for (let i = 10; i < this.slots.length; i++) {
             if (this.slots[i]) {
                 this.window.appendChild (createIconInSlot (i, this.slots[i])) }}}
 
@@ -152,7 +155,8 @@ export default class PlayerInventory {
     drawInventoryQuickbar = () => {
         for (let i = 0; i < 10; i++) {
             let className = i === this.activeQuickbarSlot ? 'column active' : 'column'
-            this.quickbar.appendChild (createElement ('div', className, { 'slot-id': i })) }}
+            this.quickbar.appendChild (createElement ('div', className, { 'slot-id': i }))
+            this.drawSlot (i) }}
 
     drawSlot = slotId => {
         let container = slotId < 10 ? this.quickbar : this.window
