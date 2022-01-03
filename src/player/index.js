@@ -8,7 +8,9 @@ import PlayerInventory from 'player/inventory'
 // Constants
 
 const UP               = new Three.Vector3 (0, 1, 0)
-const INITIAL_POSITION = new Three.Vector3 (8, 47, 12)
+const GRAVITY          = new Three.Vector3 (0, -9.81, 0)
+const INITIAL_POSITION = new Three.Vector3 (8, 45, 12)
+const INITIAL_VELOCITY = new Three.Vector3 (0, 0, 0)
 const INITIAL_ROTATION = new Three.Vector2 (Math.PI, 0)
 
 const RENDER_DISTANCE = 20
@@ -48,6 +50,7 @@ class PlayerEntity extends Entity {
 
 export default class Player {
     position = INITIAL_POSITION.clone ()
+    velocity = INITIAL_VELOCITY.clone ()
     rotation = INITIAL_ROTATION.clone ()
     gaze = getDirectionVector (INITIAL_ROTATION)
     currentChunkPosition = getChunkPosition (INITIAL_POSITION)
@@ -59,7 +62,7 @@ export default class Player {
 
     constructor (world) {
         this.world = world
-        this.world.spawnEntity (this.position.clone () .addY (-0.8), this.playerEntity) }
+        this.world.spawnEntity (this.position.clone () .addY (1), this.playerEntity) }
 
 
     // Event handlers
@@ -115,12 +118,18 @@ export default class Player {
 
     // Update handler method
 
-    step (dt, desiredMovement) {
+    step (dt, desiredMovement, desiredVelocity) {
+        // Update our velocity
+        this.velocity = this.getValidMovement (desiredVelocity .add (this.velocity) .addScaledVector (GRAVITY, 1/12000))
+
         // Update our position
-        this.position.add (this.getValidMovement (getRotatedMovementVector (desiredMovement, this.rotation) .multiplyScalar (dt / 120)))
+        this.position.add (this.getValidMovement
+            (getRotatedMovementVector (desiredMovement, this.rotation)
+                .multiplyScalar (dt / 120)
+                .add (this.velocity)))
 
         // Update the camera's position and rotation
-        this.camera.position.set (this.position.x, this.position.y, this.position.z)
+        this.camera.position.set (this.position.x, this.position.y + 1.8, this.position.z)
         this.camera.lookAt (this.camera.position.clone () .add (this.gaze))
 
         // // Update the crosshair target
@@ -140,29 +149,29 @@ export default class Player {
     getBlockPositionAtOffset = (x, y, z) =>
         new Three.Vector3 (x, y, z) .add (this.position) .floor ()
 
-    getCrosshairTarget () {
-        const target = this.world.getClosestIntersection (this.position, this.gaze)
+    getCrosshairTarget = () => {
+        const target = this.world.getClosestIntersection (this.camera.position, this.gaze)
         if (target && target.distance < 10 && target.object.name === "CHUNK")
              return this.world.getPositionAndDirectionForFaceIndex (target.object.position, target.faceIndex)
         else return null }
 
-    getValidMovement (movement) {
+    getValidMovement = movement => {
         // Floor collision check
         for (let x = -.5; x < 1; x++) {
             for (let z = -.5; z < 1; z++) {
-                if (this.world.getBlockAtPosition (this.getBlockPositionAtOffset (x, -1.8 + movement.y, z))) {
+                if (this.world.getBlockAtPosition (this.getBlockPositionAtOffset (x, movement.y, z))) {
                     movement.y = Math.max (0, movement.y) }}}
 
         // X collision check
         if (movement.x !== 0) {
-            for (let y = -1.8; y < 1; y++) {
+            for (let y = 0; y < 3; y += 0.95) {
                 for (let z = -.5; z < 1; z++) {
                     if (this.world.getBlockAtPosition (this.getBlockPositionAtOffset (0.5 * Math.sign (movement.x) + movement.x, y, z))) {
                         movement.x = 0 }}}}
 
         // Z collision check
         if (movement.z !== 0) {
-            for (let y = -1.8; y < 1; y++) {
+            for (let y = 0; y < 2; y += 0.95) {
                 for (let x = -.5; x < 1; x++) {
                     if (this.world.getBlockAtPosition (this.getBlockPositionAtOffset (x, y, 0.5 * Math.sign (movement.z) + movement.z))) {
                         movement.z = 0 }}}}

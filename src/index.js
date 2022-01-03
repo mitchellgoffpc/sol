@@ -11,6 +11,8 @@ import { range } from 'lodash'
 // Constants
 
 const ZERO = new Three.Vector3 (0, 0, 0)
+
+const KEY_JUMP = 32
 const KEY_INVENTORY = 69
 const KEY_QUICKBAR = range (48, 58)
 const KEY_DIRECTIONS = {
@@ -98,7 +100,7 @@ window.addEventListener("load", () => {
         drawCount += 1
 
         world.step (dt)
-        player.step (dt, getMovementVector (activeKeys))
+        player.step (dt, getMovementVector (activeKeys), ZERO.clone ())
         renderer.render (world.scene, player.camera)
 
         if (totalTime > 1000) {
