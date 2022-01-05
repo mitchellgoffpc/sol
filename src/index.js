@@ -41,6 +41,7 @@ window.addEventListener("load", () => {
     let controlsAreEnabled = false
     let lastRenderTimestamp = null
     let drawCount = 0, totalTime = 0
+    let lastJump = 0
 
     const setPointerLock = lock => {
         if (lock && !controlsAreEnabled)
@@ -78,11 +79,19 @@ window.addEventListener("load", () => {
             player.handleUpdateRotation (event.movementX, event.movementY) }})
 
     document.addEventListener ("keydown", event => {
-        if (event.which in KEY_DIRECTIONS && controlsAreEnabled)
+        if (event.repeat)
+            return
+        if (controlsAreEnabled && event.which in KEY_DIRECTIONS)
             activeKeys.add (event.which)
-        else if (KEY_QUICKBAR.includes(event.which))
+        if (controlsAreEnabled && event.which === KEY_JUMP) {
+            player.handleJump ()
+            if (Date.now () - lastJump < 300) {
+                 player.handleToggleFlying ()
+                 lastJump = 0 }
+            else lastJump = Date.now () }
+        if (KEY_QUICKBAR.includes(event.which))
             player.handleSetQuickbarSlot (event)
-        else if (event.which === KEY_INVENTORY) {
+        if (event.which === KEY_INVENTORY) {
             setPointerLock (!controlsAreEnabled)
             player.handleShowInventory (controlsAreEnabled) }})
 
@@ -100,7 +109,7 @@ window.addEventListener("load", () => {
         drawCount += 1
 
         world.step (dt)
-        player.step (dt, getMovementVector (activeKeys), ZERO.clone ())
+        player.step (dt, getMovementVector (activeKeys))
         renderer.render (world.scene, player.camera)
 
         if (totalTime > 1000) {

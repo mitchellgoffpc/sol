@@ -171,16 +171,6 @@ export default class Chunk {
         }}
 
 
-    // Helper method for refreshing the geometry
-
-    refreshGeometry () {
-        this.mesh.geometry.attributes.position.needsUpdate = true
-        this.mesh.geometry.attributes.color.needsUpdate = true
-
-        this.mesh.geometry.computeBoundingSphere ()
-        this.mesh.geometry.computeVertexNormals () }
-
-
     // Helper method for updating block highlights
 
     setBlockHighlight (position, highlight) {
@@ -250,4 +240,17 @@ export default class Chunk {
                 boxes.push ({ x, z, minY: 0, maxY: x + z }) }}
 
         this.world.physics.addChunk (uuid (), this.position, boxes) }
+
+
+    // Helper methods
+
+    refreshGeometry () {
+        this.mesh.geometry.attributes.position.needsUpdate = true
+        this.mesh.geometry.attributes.color.needsUpdate = true
+
+        this.mesh.geometry.computeBoundingSphere ()
+        this.mesh.geometry.computeVertexNormals () }
+
+    isLoaded = () =>
+        !this.blocks || this.mesh
 }

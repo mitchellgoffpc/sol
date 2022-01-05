@@ -8,7 +8,7 @@ import PlayerInventory from 'player/inventory'
 // Constants
 
 const UP               = new Three.Vector3 (0, 1, 0)
-const GRAVITY          = new Three.Vector3 (0, -9.81, 0)
+const GRAVITY          = new Three.Vector3 (0, -9.81/50, 0)
 const INITIAL_POSITION = new Three.Vector3 (8, 45, 12)
 const INITIAL_VELOCITY = new Three.Vector3 (0, 0, 0)
 const INITIAL_ROTATION = new Three.Vector2 (Math.PI, 0)
@@ -21,8 +21,8 @@ const AXES = [
 
 const getDirectionVector = rotation =>
     new Three.Vector3 (-Math.sin (rotation.x) * Math.cos (rotation.y),
-                 -Math.sin (rotation.y),
-                 -Math.cos (rotation.x) * Math.cos (rotation.y))
+                       -Math.sin (rotation.y),
+                       -Math.cos (rotation.x) * Math.cos (rotation.y))
 
 const getRotatedMovementVector = (movement, rotation) =>
     movement.clone () .applyAxisAngle (UP, rotation.x) .normalize ()
@@ -55,6 +55,7 @@ export default class Player {
     gaze = getDirectionVector (INITIAL_ROTATION)
     currentChunkPosition = getChunkPosition (INITIAL_POSITION)
     currentCrosshairTarget = null
+    flying = false
 
     playerEntity = new PlayerEntity ()
     inventory = new PlayerInventory ()
@@ -69,6 +70,14 @@ export default class Player {
 
     handleShowInventory = this.inventory.handleShowWindow
     handleSetQuickbarSlot = this.inventory.handleSetQuickbarSlot
+
+    handleJump = () => {
+        if (!this.flying && this.world.getBlockAtPosition (this.position.clone () .addY (-.01) .floor ())) {
+            this.velocity.addY (.07) }}
+
+    handleToggleFlying = () => {
+        this.velocity.multiplyScalar (0)
+        this.flying = !this.flying }
 
     handleUpdateRotation = (movementX, movementY) => {
         let rx = this.rotation.x - movementX / 500
@@ -118,9 +127,13 @@ export default class Player {
 
     // Update handler method
 
-    step (dt, desiredMovement, desiredVelocity) {
+    step (dt, desiredMovement) {
+        let currentChunk = this.world.getChunkAtPosition (this.position)
+        let chunkIsLoaded = currentChunk && currentChunk.isLoaded ()
+        if (!this.flying) desiredMovement.setY (0)
+
         // Update our velocity
-        this.velocity = this.getValidMovement (desiredVelocity .add (this.velocity) .addScaledVector (GRAVITY, 1/12000))
+        this.velocity = this.getValidMovement (this.velocity.clone () .addScaledVector (GRAVITY, this.flying || !chunkIsLoaded ? 0 : 1/120))
 
         // Update our position
         this.position.add (this.getValidMovement
