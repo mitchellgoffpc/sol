@@ -11,7 +11,7 @@ const UP               = new Three.Vector3 (0, 1, 0)
 const GRAVITY          = new Three.Vector3 (0, -9.81/50, 0)
 const INITIAL_POSITION = new Three.Vector3 (8, 45, 12)
 const INITIAL_VELOCITY = new Three.Vector3 (0, 0, 0)
-const INITIAL_ROTATION = new Three.Vector2 (Math.PI, 0)
+const INITIAL_ROTATION = new Three.Vector2 (0, 0)
 
 const RENDER_DISTANCE = 20
 const AXES = [

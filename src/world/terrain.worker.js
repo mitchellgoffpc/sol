@@ -13,8 +13,9 @@ const treeNoise = new SimplexNoise('trees')
 
 // Attach the message listener
 
-self.addEventListener ("message", ({ data }) => {
-    if (data.message === "createChunkTerrain") { createChunkTerrainForBatch (data) }})
+if (self) {
+    self.addEventListener ("message", ({ data }) => {
+        if (data.message === "createChunkTerrain") { createChunkTerrainForBatch (data) }}) }
 
 
 // API functions

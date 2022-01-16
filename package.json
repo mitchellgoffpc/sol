@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node app.js",
     "start-dev": "webpack-dev-server",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest tests",
     "heroku-postbuild": "webpack -p --config ./webpack.config.js --progress"
   },
   "dependencies": {
@@ -17,19 +17,25 @@
     "express": "^4.17.1",
     "lodash": "^4.17.21",
     "simplex-noise": "^3.0.0",
-    "three": "^0.133.1",
-    "webpack-dev-server": "^4.7.3"
+    "three": "^0.133.1"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",
     "@babel/preset-env": "^7.15.8",
+    "babel-jest": "^27.4.6",
     "babel-loader": "^8.1.0",
     "css-loader": "^6.4.0",
     "eslint": "^8.5.0",
     "html-webpack-plugin": "^5.4.0",
+    "jest": "^27.4.7",
     "style-loader": "^3.3.0",
     "webpack": "^5.58.2",
     "webpack-cli": "^4.9.0",
+    "webpack-dev-server": "^4.7.3",
     "worker-loader": "^2.0.0"
+  },
+  "jest": {
+    "moduleFileExtensions": ["js"],
+    "moduleDirectories": ["node_modules", "src"]
   }
 }

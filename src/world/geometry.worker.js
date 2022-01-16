@@ -47,8 +47,9 @@ const getAdjacentBlock = (blocks, neighborSide, adjacentPosition) => {
 
 // Attach the message listener
 
-self.addEventListener ("message", ({ data }) => {
-    if (data.message === "createChunkGeometry") { createChunkGeometryForBatch (data) }})
+if (self) {
+    self.addEventListener ("message", ({ data }) => {
+        if (data.message === "createChunkGeometry") { createChunkGeometryForBatch (data) }}) }
 
 
 // API functions
