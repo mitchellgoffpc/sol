@@ -47,7 +47,7 @@ const getAdjacentBlock = (blocks, neighborSide, adjacentPosition) => {
 
 // Attach the message listener
 
-if (self) {
+if (typeof self !== 'undefined') {
     self.addEventListener ("message", ({ data }) => {
         if (data.message === "createChunkGeometry") { createChunkGeometryForBatch (data) }}) }
 
@@ -71,7 +71,7 @@ function createChunkGeometryForBatch ({ chunks }) {
     self.postMessage ({ message: "createChunkGeometry", chunks: results }, transfers) }
 
 
-function createChunkGeometry ({ position, blocks, neighborSides }) {
+export function createChunkGeometry ({ position, blocks, neighborSides }) {
     let vertexIndex = 0
     let BFBIndex = 0
 

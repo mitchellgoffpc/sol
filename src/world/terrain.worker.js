@@ -13,7 +13,7 @@ const treeNoise = new SimplexNoise('trees')
 
 // Attach the message listener
 
-if (self) {
+if (typeof self !== 'undefined') {
     self.addEventListener ("message", ({ data }) => {
         if (data.message === "createChunkTerrain") { createChunkTerrainForBatch (data) }}) }
 
