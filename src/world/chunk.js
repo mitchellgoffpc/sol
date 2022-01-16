@@ -117,7 +117,7 @@ export default class Chunk {
             this.blockFaceBuffer[blockBFBOffset + faceBFBIndex] = faceIndex
             this.BFBIndicesForFaces[faceIndex] = faceBFBIndex
             this.blockIndicesForFaces[faceIndex] = blockIndex
-            this.mesh.geometry.attributes.color.array.set (colorData[faceBFBIndex], vertices * 3 + i * 3) }
+            this.mesh.geometry.attributes.color.array.set (colorData[faceBFBIndex], vertices * 3 + i * 9) }
 
         this.mesh.geometry.attributes.position.array.set (getVerticesForSide (position, direction), vertices * 3)
         this.mesh.geometry.setDrawRange (0, vertices + 6) }
@@ -162,7 +162,7 @@ export default class Chunk {
             //         const blockIndexOfBFBDataToMove = this.blockIndicesForBFBOffsets[this.blockFaceBufferSize / 12 - 1]
             //
             //         this.blockIndicesForBFBOffsets[blockBFBOffset / 12] = blockIndexOfBFBDataToMove
-            //         this.BFBOffsetForBlocks[blockIndexOfBFBDataToMove] = blockBFBOffset
+            //         this.BFBOffsetsForBlocks[blockIndexOfBFBDataToMove] = blockBFBOffset
             //         this.blockFaceBuffer.set (BFBData, blockBFBOffset) }
             //
             //     this.blockIndicesForBFBOffsets[this.blockFaceBufferSize / 12 - 1] = 0
