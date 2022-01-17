@@ -99,7 +99,7 @@ export default class Chunk {
 
     // Methods for adding and removing block faces
 
-    createBlockFace (position, direction, block, highlight = false) {
+    createBlockFace (position, direction, block, highlight = false, refresh = false) {
         const blockIndex = getBlockIndexForPosition (position)
         const vertices = this.mesh.geometry.drawRange.count
         const colorData = highlight ? block.highlightColorData : block.colorData
@@ -121,14 +121,17 @@ export default class Chunk {
             this.mesh.geometry.attributes.color.array.set (colorData[faceBFBIndex], vertices * 3 + i * 9) }
 
         this.mesh.geometry.attributes.position.array.set (getVerticesForSide (position, direction), vertices * 3)
-        this.mesh.geometry.setDrawRange (0, vertices + 6) }
+        this.mesh.geometry.setDrawRange (0, vertices + 6)
+
+        if (refresh)
+            this.refreshGeometry () }
 
 
-    removeBlockFace (position, direction) {
+    removeBlockFace (position, direction, refresh = false) {
         const blockIndex = getBlockIndexForPosition (position)
         const blockBFBOffset = this.BFBOffsetsForBlocks[blockIndex]
 
-        if (blockBFBOffset !== -1) { // In other words, if this block has any visible faces...
+        if (blockBFBOffset !== -1) { // If this block has any visible faces...
             for (let i = 0; i < 2; i++) { // Loop over the faces pointing in this direction
                 const vertices = this.mesh.geometry.drawRange.count
                 const vertexBuffer = this.mesh.geometry.attributes.position.array
@@ -136,6 +139,9 @@ export default class Chunk {
 
                 const faceIndex = this.blockFaceBuffer[blockBFBOffset + direction.index * 2 + i]
                 const faceIndexToMove = vertices / 3 - 1
+
+                if (faceIndex === -1)
+                    continue
 
                 // Move the data from the end of the vertex and color buffers into the empty space
                 if (faceIndex !== faceIndexToMove) {
@@ -153,7 +159,6 @@ export default class Chunk {
                 this.blockFaceBuffer[blockBFBOffset + direction.index * 2 + i] = -1
                 this.BFBIndicesForFaces[faceIndexToMove] = -1
                 this.blockIndicesForFaces[faceIndexToMove] = -1
-
                 this.mesh.geometry.setDrawRange (0, vertices - 3) }
 
             // Remove the blockFaceBuffer data if this block doesn't have any faces left
@@ -169,7 +174,9 @@ export default class Chunk {
                 this.blockIndicesForBFBOffsets[this.blockFaceBufferSize / 12 - 1] = -1
                 this.BFBOffsetsForBlocks[blockIndex] = -1
                 this.blockFaceBufferSize -= 12 }
-        }}
+
+            if (refresh)
+                this.refreshGeometry () }}
 
 
     // Helper method for updating block highlights
