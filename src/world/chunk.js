@@ -57,13 +57,13 @@ export default class Chunk {
             if (positionIsWithinChunk (adjacentPosition)) {
                 if (this.blocks[getBlockIndexForPosition (adjacentPosition)])
                      this.removeBlockFace (adjacentPosition, direction.opposite)
-                else this.createBlockFace (position, direction, block, true) }
+                else this.createBlockFace (position, direction, true) }
 
             else { // If the neighboring block is in a different chunk, we need to ask `this.world` to deal with it for us
                 const adjacentWorldPos = this.getWorldPosFromChunkPos (adjacentPosition)
                 if (this.world.getBlockAtPosition (adjacentWorldPos))
                      this.world.removeBlockFace (adjacentWorldPos, direction.opposite)
-                else this.createBlockFace (position, direction, block, true) }})
+                else this.createBlockFace (position, direction, true) }})
 
         this.refreshGeometry () }
 
@@ -81,16 +81,14 @@ export default class Chunk {
     destroyBlock (position) {
         Directions.getAdjacentPositions (position) .forEach (({ direction, adjacentPosition }) => {
             if (positionIsWithinChunk (adjacentPosition)) {
-                const adjacentBlockID = this.blocks[getBlockIndexForPosition (adjacentPosition)]
-                if (adjacentBlockID)
-                     this.createBlockFace (adjacentPosition, direction.opposite, Blocks.fromBlockID (adjacentBlockID))
+                if (this.blocks[getBlockIndexForPosition (adjacentPosition)])
+                     this.createBlockFace (adjacentPosition, direction.opposite)
                 else this.removeBlockFace (position, direction) }
 
             else { // If the neighboring block is in a different chunk, we need to ask `this.world` to deal with it for us
                 const adjacentWorldPos = this.getWorldPosFromChunkPos (adjacentPosition)
-                const adjacentBlockID = this.world.getBlockAtPosition (adjacentWorldPos)
-                if (adjacentBlockID)
-                     this.world.createBlockFace (adjacentWorldPos, direction.opposite, Blocks.fromBlockID (adjacentBlockID))
+                if (this.world.getBlockAtPosition (adjacentWorldPos))
+                     this.world.createBlockFace (adjacentWorldPos, direction.opposite)
                 else this.removeBlockFace (position, direction) }})
 
         this.blocks[getBlockIndexForPosition (position)] = 0
@@ -99,8 +97,9 @@ export default class Chunk {
 
     // Methods for adding and removing block faces
 
-    createBlockFace (position, direction, block, highlight = false, refresh = false) {
+    createBlockFace (position, direction, highlight = false, refresh = false) {
         const blockIndex = getBlockIndexForPosition (position)
+        const block = Blocks.fromBlockID (this.blocks[blockIndex])
         const vertices = this.mesh.geometry.drawRange.count
         const colorData = highlight ? block.highlightColorData : block.colorData
 

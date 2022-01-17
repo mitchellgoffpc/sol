@@ -104,8 +104,8 @@ export default class World {
 
     // Methods for adding and removing block faces
 
-    createBlockFace (position, direction, block) {
-        this.withChunk (position, (chunk, chunkPos) => chunk.createBlockFace (chunkPos, direction, block, false, true)) }
+    createBlockFace (position, direction) {
+        this.withChunk (position, (chunk, chunkPos) => chunk.createBlockFace (chunkPos, direction, false, true)) }
 
     removeBlockFace (position, direction) {
         this.withChunk (position, (chunk, chunkPos) => chunk.removeBlockFace (chunkPos, direction, true)) }

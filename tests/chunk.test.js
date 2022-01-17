@@ -73,7 +73,8 @@ describe ('createBlockFace', () => {
         const bfbSize = chunk.blockFaceBufferSize
         expect (chunk.BFBOffsetsForBlocks[blockIndex]) .toBe (-1)
 
-        chunk.createBlockFace (position, Directions.WEST, Blocks.Log)
+        chunk.blocks[blockIndex] = Blocks.Log.ID
+        chunk.createBlockFace (position, Directions.WEST)
 
         // Check vertex and color buffers
         expect (chunk.mesh.geometry.drawRange.count) .toBe (vertexBufferSize / 3 + 6)
@@ -107,7 +108,8 @@ describe ('createBlockFace', () => {
         const bfbOffset = chunk.BFBOffsetsForBlocks[blockIndex]
         expect (bfbOffset) .not.toBe (-1)
 
-        chunk.createBlockFace (position, Directions.WEST, Blocks.Log)
+        chunk.blocks[blockIndex] = Blocks.Log.ID
+        chunk.createBlockFace (position, Directions.WEST)
 
         // Check vertex buffer
         expect (chunk.mesh.geometry.drawRange.count) .toBe (vertexBufferSize / 3 + 6)
