@@ -21,16 +21,16 @@ import { getBlockIndexForPosition,
 //     by their neighbors, this saves memory by letting us allocate space only for
 //     blocks that have at least once visible face.
 //
-//  -- BFBOffsetsForBlocks maps each block position to a position in
+//  -- bfbOffsetsForBlocks maps each block position to a position in
 //     blockFaceBuffer that contains all the face indices for that block,
 //     or -1 if the block has no visible faces.
 //
-//  -- BFBIndicesForFaces maps each faceIndex to an index in that face's block data
+//  -- bfbIndicesForFaces maps each faceIndex to an index in that face's block data
 //     in `blockFaceBuffer`. This is convenient for tracking which direction the face
 //     is pointing, and for quickly updating the buffer data when we need to rearrange
 //     the vertex buffer.
 //
-//  -- blockIndicesForBFBOffsets maps each offset in blockFaceBuffer to a block index.
+//  -- blockIndicesForBfbOffsets maps each offset in blockFaceBuffer to a block index.
 //     This is useful anytime we have to deallocate the space in the BFB for a block
 //     that isn't visible anymore.
 
@@ -103,21 +103,21 @@ export default class Chunk {
         const vertices = this.mesh.geometry.drawRange.count
         const colorData = highlight ? block.highlightColorData : block.colorData
 
-        // If this block doesn't have any visible faces, allocate some new space in the BFB
-        if (this.BFBOffsetsForBlocks[blockIndex] === -1) {
-            this.BFBOffsetsForBlocks[blockIndex] = this.blockFaceBufferSize
-            this.blockIndicesForBFBOffsets[this.blockFaceBufferSize / 12] = blockIndex
+        // If this block doesn't have any visible faces, allocate some new space in the bfb
+        if (this.bfbOffsetsForBlocks[blockIndex] === -1) {
+            this.bfbOffsetsForBlocks[blockIndex] = this.blockFaceBufferSize
+            this.blockIndicesForBfbOffsets[this.blockFaceBufferSize / 12] = blockIndex
             this.blockFaceBufferSize += 12 }
 
-        const blockBFBOffset = this.BFBOffsetsForBlocks[blockIndex]
+        const blockBfbOffset = this.bfbOffsetsForBlocks[blockIndex]
         for (let i = 0; i < 2; i++) { // Loop twice because we need two faces per side
             const faceIndex = vertices / 3 + i
-            const faceBFBIndex = direction.index * 2 + i
+            const faceBfbIndex = direction.index * 2 + i
 
-            this.blockFaceBuffer[blockBFBOffset + faceBFBIndex] = faceIndex
-            this.BFBIndicesForFaces[faceIndex] = faceBFBIndex
+            this.blockFaceBuffer[blockBfbOffset + faceBfbIndex] = faceIndex
+            this.bfbIndicesForFaces[faceIndex] = faceBfbIndex
             this.blockIndicesForFaces[faceIndex] = blockIndex
-            this.mesh.geometry.attributes.color.array.set (colorData[faceBFBIndex], vertices * 3 + i * 9) }
+            this.mesh.geometry.attributes.color.array.set (colorData[faceBfbIndex], vertices * 3 + i * 9) }
 
         this.mesh.geometry.attributes.position.array.set (getVerticesForSide (position, direction), vertices * 3)
         this.mesh.geometry.setDrawRange (0, vertices + 6)
@@ -128,15 +128,15 @@ export default class Chunk {
 
     removeBlockFace (position, direction, refresh = false) {
         const blockIndex = getBlockIndexForPosition (position)
-        const blockBFBOffset = this.BFBOffsetsForBlocks[blockIndex]
+        const blockBfbOffset = this.bfbOffsetsForBlocks[blockIndex]
 
-        if (blockBFBOffset !== -1) { // If this block has any visible faces...
+        if (blockBfbOffset !== -1) { // If this block has any visible faces...
             for (let i = 0; i < 2; i++) { // Loop over the faces pointing in this direction
                 const vertices = this.mesh.geometry.drawRange.count
                 const vertexBuffer = this.mesh.geometry.attributes.position.array
                 const colorBuffer = this.mesh.geometry.attributes.color.array
 
-                const faceIndex = this.blockFaceBuffer[blockBFBOffset + direction.index * 2 + i]
+                const faceIndex = this.blockFaceBuffer[blockBfbOffset + direction.index * 2 + i]
                 const faceIndexToMove = vertices / 3 - 1
 
                 if (faceIndex === -1)
@@ -148,30 +148,30 @@ export default class Chunk {
                     colorBuffer.set  (colorBuffer.slice  (faceIndexToMove * 9, faceIndexToMove * 9 + 9), faceIndex * 9)
 
                     const blockIndexOfFaceToMove = this.blockIndicesForFaces[faceIndexToMove]
-                    const BFBIndexOfFaceToMove = this.BFBIndicesForFaces[faceIndexToMove]
-                    const BFBOffsetOfFaceToMove = this.BFBOffsetsForBlocks[blockIndexOfFaceToMove] + BFBIndexOfFaceToMove
+                    const bfbIndexOfFaceToMove = this.bfbIndicesForFaces[faceIndexToMove]
+                    const bfbOffsetOfFaceToMove = this.bfbOffsetsForBlocks[blockIndexOfFaceToMove] + bfbIndexOfFaceToMove
 
-                    this.blockFaceBuffer[BFBOffsetOfFaceToMove] = faceIndex
-                    this.BFBIndicesForFaces[faceIndex] = BFBIndexOfFaceToMove
+                    this.blockFaceBuffer[bfbOffsetOfFaceToMove] = faceIndex
+                    this.bfbIndicesForFaces[faceIndex] = bfbIndexOfFaceToMove
                     this.blockIndicesForFaces[faceIndex] = blockIndexOfFaceToMove }
 
-                this.blockFaceBuffer[blockBFBOffset + direction.index * 2 + i] = -1
-                this.BFBIndicesForFaces[faceIndexToMove] = -1
+                this.blockFaceBuffer[blockBfbOffset + direction.index * 2 + i] = -1
+                this.bfbIndicesForFaces[faceIndexToMove] = -1
                 this.blockIndicesForFaces[faceIndexToMove] = -1
                 this.mesh.geometry.setDrawRange (0, vertices - 3) }
 
             // Remove the blockFaceBuffer data if this block doesn't have any faces left
-            if (this.blockFaceBuffer.slice (blockBFBOffset, blockBFBOffset + 12) .every (x => x === -1)) {
-                if (blockBFBOffset !== this.blockFaceBufferSize - 12) {
-                    const BFBDataToMove = this.blockFaceBuffer.slice (this.blockFaceBufferSize - 12, this.blockFaceBufferSize)
-                    const blockIndexOfBFBDataToMove = this.blockIndicesForBFBOffsets[this.blockFaceBufferSize / 12 - 1]
+            if (this.blockFaceBuffer.slice (blockBfbOffset, blockBfbOffset + 12) .every (x => x === -1)) {
+                if (blockBfbOffset !== this.blockFaceBufferSize - 12) {
+                    const bfbDataToMove = this.blockFaceBuffer.slice (this.blockFaceBufferSize - 12, this.blockFaceBufferSize)
+                    const blockIndexOfBfbDataToMove = this.blockIndicesForBfbOffsets[this.blockFaceBufferSize / 12 - 1]
 
-                    this.blockIndicesForBFBOffsets[blockBFBOffset / 12] = blockIndexOfBFBDataToMove
-                    this.BFBOffsetsForBlocks[blockIndexOfBFBDataToMove] = blockBFBOffset
-                    this.blockFaceBuffer.set (BFBDataToMove, blockBFBOffset) }
+                    this.blockIndicesForBfbOffsets[blockBfbOffset / 12] = blockIndexOfBfbDataToMove
+                    this.bfbOffsetsForBlocks[blockIndexOfBfbDataToMove] = blockBfbOffset
+                    this.blockFaceBuffer.set (bfbDataToMove, blockBfbOffset) }
 
-                this.blockIndicesForBFBOffsets[this.blockFaceBufferSize / 12 - 1] = -1
-                this.BFBOffsetsForBlocks[blockIndex] = -1
+                this.blockIndicesForBfbOffsets[this.blockFaceBufferSize / 12 - 1] = -1
+                this.bfbOffsetsForBlocks[blockIndex] = -1
                 this.blockFaceBufferSize -= 12 }
 
             if (refresh)
@@ -185,13 +185,13 @@ export default class Chunk {
 
         if (this.blocks[blockIndex]) {
             const block = Blocks.fromBlockID (this.blocks[blockIndex])
-            const blockBFBOffset = this.BFBOffsetsForBlocks[blockIndex]
+            const blockBfbOffset = this.bfbOffsetsForBlocks[blockIndex]
             const colorData = highlight ? block.highlightColorData : block.colorData
             const colorAttribute = this.mesh.geometry.attributes.color
 
             for (let i = 0; i < 12; i++) {
-                if (this.blockFaceBuffer[blockBFBOffset + i] !== -1) {
-                    colorAttribute.array.set (colorData[i], this.blockFaceBuffer[blockBFBOffset + i] * 9) }}
+                if (this.blockFaceBuffer[blockBfbOffset + i] !== -1) {
+                    colorAttribute.array.set (colorData[i], this.blockFaceBuffer[blockBfbOffset + i] * 9) }}
 
             colorAttribute.needsUpdate = true }}
 
@@ -205,7 +205,7 @@ export default class Chunk {
         return getPositionForBlockIndex (this.blockIndicesForFaces[faceIndex]) }
 
     getDirectionForFaceIndex (faceIndex) {
-        return Directions.ByIndex[Math.floor (this.BFBIndicesForFaces[faceIndex] / 2)] }
+        return Directions.ByIndex[Math.floor (this.bfbIndicesForFaces[faceIndex] / 2)] }
 
     getChunkPosFromWorldPos ({ x, y, z }) {
         return { x: x - this.position.x * 16, y: y - this.position.y * 16, z: z - this.position.z * 16 }}
@@ -218,10 +218,10 @@ export default class Chunk {
 
     createBufferGeometry (buffers, vertexBufferSize, blockFaceBufferSize) {
         this.blockFaceBuffer = buffers.blockFaceBuffer
-        this.BFBIndicesForFaces = buffers.BFBIndicesForFaces
-        this.BFBOffsetsForBlocks = buffers.BFBOffsetsForBlocks
+        this.bfbIndicesForFaces = buffers.bfbIndicesForFaces
+        this.bfbOffsetsForBlocks = buffers.bfbOffsetsForBlocks
         this.blockIndicesForFaces = buffers.blockIndicesForFaces
-        this.blockIndicesForBFBOffsets = buffers.blockIndicesForBFBOffsets
+        this.blockIndicesForBfbOffsets = buffers.blockIndicesForBfbOffsets
         this.blockFaceBufferSize = blockFaceBufferSize
 
         const geometry = new Three.BufferGeometry ()

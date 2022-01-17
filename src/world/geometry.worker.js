@@ -15,9 +15,9 @@ const colorBuffer  = new Float32Array (CHUNK_VOLUME * 108)
 
 const blockIndicesForFaces      = new Int32Array (CHUNK_VOLUME * 12)
 const blockFaceBuffer           = new Int32Array (CHUNK_VOLUME * 12)
-const BFBIndicesForFaces        = new Int32Array (CHUNK_VOLUME * 12)
-const BFBOffsetsForBlocks       = new Int32Array (CHUNK_VOLUME)
-const blockIndicesForBFBOffsets = new Int32Array (CHUNK_VOLUME)
+const bfbIndicesForFaces        = new Int32Array (CHUNK_VOLUME * 12)
+const bfbOffsetsForBlocks       = new Int32Array (CHUNK_VOLUME)
+const blockIndicesForBfbOffsets = new Int32Array (CHUNK_VOLUME)
 
 const faceIndices = new Int32Array (12)
 
@@ -63,23 +63,23 @@ function createChunkGeometryForBatch ({ chunks }) {
         transfers.push (results[i].buffers.vertexBuffer.buffer,
                         results[i].buffers.colorBuffer.buffer,
                         results[i].buffers.blockFaceBuffer.buffer,
-                        results[i].buffers.BFBIndicesForFaces.buffer,
+                        results[i].buffers.bfbIndicesForFaces.buffer,
                         results[i].buffers.blockIndicesForFaces.buffer,
-                        results[i].buffers.blockIndicesForBFBOffsets.buffer,
-                        results[i].buffers.BFBOffsetsForBlocks.buffer) }
+                        results[i].buffers.blockIndicesForBfbOffsets.buffer,
+                        results[i].buffers.bfbOffsetsForBlocks.buffer) }
 
     self.postMessage ({ message: "createChunkGeometry", chunks: results }, transfers) }
 
 
 export function createChunkGeometry ({ position, blocks, neighborSides }) {
     let vertexIndex = 0
-    let BFBIndex = 0
+    let bfbIndex = 0
 
     blockFaceBuffer.fill (-1)
     blockIndicesForFaces.fill (-1)
-    blockIndicesForBFBOffsets.fill (-1)
-    BFBIndicesForFaces.fill (-1)
-    BFBOffsetsForBlocks.fill (-1)
+    blockIndicesForBfbOffsets.fill (-1)
+    bfbIndicesForFaces.fill (-1)
+    bfbOffsetsForBlocks.fill (-1)
 
     // Loop over all the blocks in this chunk
     for (let blockIndex = 0; blockIndex < CHUNK_VOLUME; blockIndex++) {
@@ -98,10 +98,10 @@ export function createChunkGeometry ({ position, blocks, neighborSides }) {
                 if (!adjacentBlock) {
                     for (let j = 0; j < 2; j++) { // Loop twice because we need two faces per side
                         const faceIndex = vertexIndex / 9 + j
-                        const faceBFBIndex = i * 2 + j
+                        const faceBfbIndex = i * 2 + j
 
-                        faceIndices[faceBFBIndex] = faceIndex
-                        BFBIndicesForFaces[faceIndex] = faceBFBIndex
+                        faceIndices[faceBfbIndex] = faceIndex
+                        bfbIndicesForFaces[faceIndex] = faceBfbIndex
                         blockIndicesForFaces[faceIndex] = blockIndex
                         colorBuffer.set (block.colorData[i], vertexIndex + j * 9) }
 
@@ -111,21 +111,21 @@ export function createChunkGeometry ({ position, blocks, neighborSides }) {
 
             // If this block has any visible faces, we'll add it to the BFB
             if (blockHasVisibleFaces) {
-                blockFaceBuffer.set (faceIndices, BFBIndex)
-                blockIndicesForBFBOffsets[BFBIndex / 12] = blockIndex
-                BFBOffsetsForBlocks[blockIndex] = BFBIndex
-                BFBIndex += 12 }}}
+                blockFaceBuffer.set (faceIndices, bfbIndex)
+                blockIndicesForBfbOffsets[bfbIndex / 12] = blockIndex
+                bfbOffsetsForBlocks[blockIndex] = bfbIndex
+                bfbIndex += 12 }}}
 
     // Copy and slice all our buffers down to the correct sizes
     const bufferSize = nextPowerOf2 (vertexIndex / 3) * 3
-    const blockFaceBufferSize = nextPowerOf2 (BFBIndex / 3) * 3
+    const blockFaceBufferSize = nextPowerOf2 (bfbIndex / 3) * 3
     const buffers =
         { vertexBuffer:              vertexBuffer.slice (0, bufferSize),
           colorBuffer:               colorBuffer.slice (0, bufferSize),
           blockFaceBuffer:           blockFaceBuffer.slice (0, blockFaceBufferSize),
-          BFBIndicesForFaces:        BFBIndicesForFaces.slice (0, bufferSize),
+          bfbIndicesForFaces:        bfbIndicesForFaces.slice (0, bufferSize),
           blockIndicesForFaces:      blockIndicesForFaces.slice (0, bufferSize),
-          blockIndicesForBFBOffsets: blockIndicesForBFBOffsets.slice (0, blockFaceBufferSize / 12),
-          BFBOffsetsForBlocks:       BFBOffsetsForBlocks.slice () }
+          blockIndicesForBfbOffsets: blockIndicesForBfbOffsets.slice (0, blockFaceBufferSize / 12),
+          bfbOffsetsForBlocks:       bfbOffsetsForBlocks.slice () }
 
-    return { position, buffers, vertexBufferSize: vertexIndex, blockFaceBufferSize: BFBIndex }}
+    return { position, buffers, vertexBufferSize: vertexIndex, blockFaceBufferSize: bfbIndex }}

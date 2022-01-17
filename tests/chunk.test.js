@@ -35,12 +35,12 @@ beforeEach (() => {
 
 function checkBufferConsistency (expect) {
     for (let i = 0; i < geometry.blockFaceBufferSize / 12; i++) {
-        expect (geometry.buffers.BFBOffsetsForBlocks[geometry.buffers.blockIndicesForBFBOffsets[i]]) .toBe (i * 12) }
+        expect (geometry.buffers.bfbOffsetsForBlocks[geometry.buffers.blockIndicesForBfbOffsets[i]]) .toBe (i * 12) }
 
     for (let i = 0; i < chunk.blocks.length; i++) {
-        let offset = geometry.buffers.BFBOffsetsForBlocks[i]
+        let offset = geometry.buffers.bfbOffsetsForBlocks[i]
         if (offset > -1) {
-            expect (geometry.buffers.blockIndicesForBFBOffsets[offset / 12]) .toBe (i) }}}
+            expect (geometry.buffers.blockIndicesForBfbOffsets[offset / 12]) .toBe (i) }}}
 
 test ('vertexBuffer is the right size', () => {
     expect (geometry.vertexBufferSize) .toBe (18 * (2*16*16 + 4*16*8))
@@ -53,7 +53,7 @@ test ('blockFaceBuffer is the right size', () => {
     expect (geometry.buffers.blockFaceBuffer.slice (geometry.blockFaceBufferSize) .every (x => x == -1)) .toBe (true)
     expect (geometry.buffers.blockFaceBuffer.slice (0, geometry.blockFaceBuffer) .count (x => x > -1)) .toBe (2 * (2*16*16 + 4*16*8)) })
 
-test ('blockIndicesForBFBOffsets matches BFBOffsetsForBlocks', () => {
+test ('blockIndicesForBfbOffsets matches bfbOffsetsForBlocks', () => {
     checkBufferConsistency (expect) })
 
 test ('getBlockAtPosition', () => {
@@ -71,7 +71,7 @@ describe ('createBlockFace', () => {
         const colors = colorBuffer.slice (0, vertexBufferSize)
         const blockIndex = getBlockIndexForPosition (position)
         const bfbSize = chunk.blockFaceBufferSize
-        expect (chunk.BFBOffsetsForBlocks[blockIndex]) .toBe (-1)
+        expect (chunk.bfbOffsetsForBlocks[blockIndex]) .toBe (-1)
 
         chunk.blocks[blockIndex] = Blocks.Log.ID
         chunk.createBlockFace (position, Directions.WEST)
@@ -85,14 +85,14 @@ describe ('createBlockFace', () => {
         expect (colorBuffer.slice (vertexBufferSize + 9, vertexBufferSize + 18) .equals (Blocks.Log.colorData [Directions.WEST.index])) .toBe (true)
 
         // Check block face buffer
-        const bfbOffset = chunk.BFBOffsetsForBlocks[blockIndex]
+        const bfbOffset = chunk.bfbOffsetsForBlocks[blockIndex]
         expect (bfbOffset) .not.toBe (-1)
-        expect (chunk.blockIndicesForBFBOffsets[bfbOffset / 12]) .toBe (blockIndex)
+        expect (chunk.blockIndicesForBfbOffsets[bfbOffset / 12]) .toBe (blockIndex)
         expect (chunk.blockFaceBufferSize) .toBe (bfbSize + 12)
 
         // Check buffer consistency
         for (let i = 0; i < 2; i++) {
-            expect (chunk.BFBIndicesForFaces[vertexBufferSize / 9 + i]) .toBe (Directions.WEST.index * 2 + i)
+            expect (chunk.bfbIndicesForFaces[vertexBufferSize / 9 + i]) .toBe (Directions.WEST.index * 2 + i)
             expect (chunk.blockIndicesForFaces[vertexBufferSize / 9 + i]) .toBe (blockIndex)
             expect (chunk.blockFaceBuffer[bfbOffset + Directions.WEST.index * 2 + i]) .toBe (vertexBufferSize / 9 + i) }})
 
@@ -105,7 +105,7 @@ describe ('createBlockFace', () => {
         const colors = colorBuffer.slice (0, vertexBufferSize)
         const blockIndex = getBlockIndexForPosition (position)
         const bfbSize = chunk.blockFaceBufferSize
-        const bfbOffset = chunk.BFBOffsetsForBlocks[blockIndex]
+        const bfbOffset = chunk.bfbOffsetsForBlocks[blockIndex]
         expect (bfbOffset) .not.toBe (-1)
 
         chunk.blocks[blockIndex] = Blocks.Log.ID
@@ -121,12 +121,12 @@ describe ('createBlockFace', () => {
 
         // Check block face buffer
         expect (chunk.blockFaceBufferSize) .toBe (bfbSize)
-        expect (chunk.BFBOffsetsForBlocks[blockIndex]) .toBe (bfbOffset)
-        expect (chunk.blockIndicesForBFBOffsets[bfbOffset / 12]) .toBe (blockIndex)
+        expect (chunk.bfbOffsetsForBlocks[blockIndex]) .toBe (bfbOffset)
+        expect (chunk.blockIndicesForBfbOffsets[bfbOffset / 12]) .toBe (blockIndex)
 
         // Check buffer consistency
         for (let i = 0; i < 2; i++) {
-            expect (chunk.BFBIndicesForFaces[vertexBufferSize / 9 + i]) .toBe (Directions.WEST.index * 2 + i)
+            expect (chunk.bfbIndicesForFaces[vertexBufferSize / 9 + i]) .toBe (Directions.WEST.index * 2 + i)
             expect (chunk.blockIndicesForFaces[vertexBufferSize / 9 + i]) .toBe (blockIndex)
             expect (chunk.blockFaceBuffer[bfbOffset + Directions.WEST.index * 2 + i]) .toBe (vertexBufferSize / 9 + i) }}) })
 
@@ -139,12 +139,12 @@ describe ('removeBlockFace', () => {
         const vertices = vertexBuffer.slice (0, vertexBufferSize)
         const blockIndex = getBlockIndexForPosition (position)
         const bfbSize = chunk.blockFaceBufferSize
-        const bfbOffset = chunk.BFBOffsetsForBlocks[blockIndex]
+        const bfbOffset = chunk.bfbOffsetsForBlocks[blockIndex]
         const bfbIndex = bfbOffset + Directions.EAST.index * 2
         const faceIndex = chunk.blockFaceBuffer[bfbIndex]
         const blockIndexOfFaceToMove = chunk.blockIndicesForFaces[vertexBufferSize / 9 - 2]
-        const bfbOffsetOfFaceToMove = chunk.BFBOffsetsForBlocks[blockIndexOfFaceToMove]
-        const bfbIndexOfFaceToMove = chunk.BFBIndicesForFaces[vertexBufferSize / 9 - 2]
+        const bfbOffsetOfFaceToMove = chunk.bfbOffsetsForBlocks[blockIndexOfFaceToMove]
+        const bfbIndexOfFaceToMove = chunk.bfbIndicesForFaces[vertexBufferSize / 9 - 2]
         expect (bfbOffset) .not.toBe (-1)
         expect (chunk.blockFaceBuffer.slice (bfbIndex, bfbIndex + 2) .every (x => x != -1)) .toBe (true)
 
@@ -163,13 +163,13 @@ describe ('removeBlockFace', () => {
 
         // Check block face buffer
         expect (chunk.blockFaceBufferSize) .toBe (bfbSize)
-        expect (chunk.BFBOffsetsForBlocks[blockIndex]) .toBe (bfbOffset)
-        expect (chunk.blockIndicesForBFBOffsets[bfbOffset / 12]) .toBe (blockIndex)
+        expect (chunk.bfbOffsetsForBlocks[blockIndex]) .toBe (bfbOffset)
+        expect (chunk.blockIndicesForBfbOffsets[bfbOffset / 12]) .toBe (blockIndex)
         expect (chunk.blockFaceBuffer.slice (bfbIndex, bfbIndex + 2) .every (x => x == -1)) .toBe (true)
 
         // Check buffer consistency
         for (let i = 0; i < 2; i++) {
-            expect (chunk.BFBIndicesForFaces[faceIndex + 1 - i]) .toBe (bfbIndexOfFaceToMove + i)
+            expect (chunk.bfbIndicesForFaces[faceIndex + 1 - i]) .toBe (bfbIndexOfFaceToMove + i)
             expect (chunk.blockIndicesForFaces[faceIndex + 1 - i]) .toBe (blockIndexOfFaceToMove)
             expect (chunk.blockFaceBuffer[bfbOffsetOfFaceToMove + bfbIndexOfFaceToMove + 1 - i]) .toBe (faceIndex + i) }})
 
@@ -180,13 +180,13 @@ describe ('removeBlockFace', () => {
         const vertices = vertexBuffer.slice (0, vertexBufferSize)
         const blockIndex = getBlockIndexForPosition (position)
         const bfbSize = chunk.blockFaceBufferSize
-        const bfbOffset = chunk.BFBOffsetsForBlocks[blockIndex]
+        const bfbOffset = chunk.bfbOffsetsForBlocks[blockIndex]
         const bfbIndex = bfbOffset + Directions.EAST.index * 2
         const faceIndex = chunk.blockFaceBuffer[bfbIndex]
         const blockIndexOfFaceToMove = chunk.blockIndicesForFaces[vertexBufferSize / 9 - 2]
-        const bfbOffsetOfFaceToMove = chunk.BFBOffsetsForBlocks[blockIndexOfFaceToMove]
-        const bfbIndexOfFaceToMove = chunk.BFBIndicesForFaces[vertexBufferSize / 9 - 2]
-        const blockIndexOfBFBDataToMove = chunk.blockIndicesForBFBOffsets[bfbSize / 12 - 1]
+        const bfbOffsetOfFaceToMove = chunk.bfbOffsetsForBlocks[blockIndexOfFaceToMove]
+        const bfbIndexOfFaceToMove = chunk.bfbIndicesForFaces[vertexBufferSize / 9 - 2]
+        const blockIndexOfBfbDataToMove = chunk.blockIndicesForBfbOffsets[bfbSize / 12 - 1]
         expect (bfbOffset) .not.toBe (-1)
         expect (chunk.blockFaceBuffer.slice (bfbIndex, bfbIndex + 2) .every (x => x != -1)) .toBe (true)
 
@@ -205,26 +205,25 @@ describe ('removeBlockFace', () => {
 
         // Check block face buffer
         expect (chunk.blockFaceBufferSize) .toBe (bfbSize - 12)
-        expect (chunk.BFBOffsetsForBlocks[blockIndex]) .toBe (-1)
-        expect (chunk.BFBOffsetsForBlocks[blockIndexOfBFBDataToMove]) .toBe (bfbOffset)
-        expect (chunk.blockIndicesForBFBOffsets[bfbOffset / 12]) .toBe (blockIndexOfBFBDataToMove)
+        expect (chunk.bfbOffsetsForBlocks[blockIndex]) .toBe (-1)
+        expect (chunk.bfbOffsetsForBlocks[blockIndexOfBfbDataToMove]) .toBe (bfbOffset)
+        expect (chunk.blockIndicesForBfbOffsets[bfbOffset / 12]) .toBe (blockIndexOfBfbDataToMove)
 
         // Check buffer consistency
         for (let i = 0; i < 2; i++) {
-            expect (chunk.BFBIndicesForFaces[faceIndex + 1 - i]) .toBe (bfbIndexOfFaceToMove + i)
+            expect (chunk.bfbIndicesForFaces[faceIndex + 1 - i]) .toBe (bfbIndexOfFaceToMove + i)
             expect (chunk.blockIndicesForFaces[faceIndex + 1 - i]) .toBe (blockIndexOfFaceToMove)
-            expect (chunk.blockFaceBuffer[bfbOffsetOfFaceToMove + bfbIndexOfFaceToMove + 1 - i]) .toBe (faceIndex + i) }})
-})
+            expect (chunk.blockFaceBuffer[bfbOffsetOfFaceToMove + bfbIndexOfFaceToMove + 1 - i]) .toBe (faceIndex + i) }}) })
 
 
 // test ('placeBlock in center', () => {
 //     const position = { x: 8, y: 8, z: 8 }
 //     const adjacentBlockIndex = getBlockIndexForPosition ({ x: 7, y: 8, z: 8 })
-//     const adjacentBFBOffset = chunk.BFBOffsetsForBlocks[adjacentBlockIndex]
-//     const adjacentFaceIndices = chunk.blockFaceBuffer.slice (adjacentBFBOffset + 2, adjacentBFBOffset + 4)
+//     const adjacentBfbOffset = chunk.bfbOffsetsForBlocks[adjacentBlockIndex]
+//     const adjacentFaceIndices = chunk.blockFaceBuffer.slice (adjacentBfbOffset + 2, adjacentBfbOffset + 4)
 //
 //     chunk.placeBlock (position, Blocks.Log)
 //     expect (chunk.getBlockAtPosition (position)) .toBe (Blocks.Log.ID)
-//     expect (chunk.blockFaceBuffer.slice (adjacentBFBOffset, adjacentBFBOffset + 12) .every (x => x == -1)) .toBe (true)
+//     expect (chunk.blockFaceBuffer.slice (adjacentBfbOffset, adjacentBfbOffset + 12) .every (x => x == -1)) .toBe (true)
 //     checkBufferConsistency (expect)
 // })
