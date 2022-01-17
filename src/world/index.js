@@ -147,9 +147,9 @@ export default class World {
         let chunksToRender = []
 
         // Create chunk objects with the buffer data from the worker
-        data.chunks.forEach (({ position, blocks, sides, sidesAreSolid }) => {
+        data.chunks.forEach (({ position, blocks, blockGroups, sides, sidesAreSolid }) => {
             if (!this.getChunkAtCoords (position)) {
-                const chunk = new Chunk (this, position, blocks, sides, sidesAreSolid)
+                const chunk = new Chunk (this, position, blocks, blockGroups, sides, sidesAreSolid)
                 this.setChunkAtCoords (position, chunk)
 
                 // Update the neighbor references and counts for all adjacent chunks

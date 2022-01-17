@@ -39,10 +39,11 @@ export default class Chunk {
     loadedNeighbors = 0
     lights = {}
 
-    constructor (world, position, blocks, sides, sidesAreSolid) {
+    constructor (world, position, blocks, blockGroups, sides, sidesAreSolid) {
         this.world = world
         this.position = position
         this.blocks = blocks
+        this.blockGroups = blockGroups
         this.sides = sides
         this.sidesAreSolid = sidesAreSolid }
 
@@ -156,18 +157,18 @@ export default class Chunk {
                 this.mesh.geometry.setDrawRange (0, vertices - 3) }
 
             // Remove the blockFaceBuffer data if this block doesn't have any faces left
-            // if (this.blockFaceBuffer.slice (blockBFBOffset, blockBFBOffset + 12) .every (x => x === -1)) {
-            //     if (blockBFBOffset !== this.blockFaceBufferSize - 12) {
-            //         const BFBDataToMove = this.blockFaceBuffer.slice (this.blockFaceBufferSize - 12, this.blockFaceBufferSize)
-            //         const blockIndexOfBFBDataToMove = this.blockIndicesForBFBOffsets[this.blockFaceBufferSize / 12 - 1]
-            //
-            //         this.blockIndicesForBFBOffsets[blockBFBOffset / 12] = blockIndexOfBFBDataToMove
-            //         this.BFBOffsetsForBlocks[blockIndexOfBFBDataToMove] = blockBFBOffset
-            //         this.blockFaceBuffer.set (BFBData, blockBFBOffset) }
-            //
-            //     this.blockIndicesForBFBOffsets[this.blockFaceBufferSize / 12 - 1] = 0
-            //     this.BFBOffsetsForBlocks[blockIndex] = -1
-            //     this.blockFaceBufferSize -= 12 }
+            if (this.blockFaceBuffer.slice (blockBFBOffset, blockBFBOffset + 12) .every (x => x === -1)) {
+                if (blockBFBOffset !== this.blockFaceBufferSize - 12) {
+                    const BFBDataToMove = this.blockFaceBuffer.slice (this.blockFaceBufferSize - 12, this.blockFaceBufferSize)
+                    const blockIndexOfBFBDataToMove = this.blockIndicesForBFBOffsets[this.blockFaceBufferSize / 12 - 1]
+
+                    this.blockIndicesForBFBOffsets[blockBFBOffset / 12] = blockIndexOfBFBDataToMove
+                    this.BFBOffsetsForBlocks[blockIndexOfBFBDataToMove] = blockBFBOffset
+                    this.blockFaceBuffer.set (BFBDataToMove, blockBFBOffset) }
+
+                this.blockIndicesForBFBOffsets[this.blockFaceBufferSize / 12 - 1] = -1
+                this.BFBOffsetsForBlocks[blockIndex] = -1
+                this.blockFaceBufferSize -= 12 }
         }}
 
 

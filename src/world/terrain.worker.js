@@ -25,7 +25,7 @@ function createChunkTerrainForBatch ({ positions }) {
     let transfers = []
 
     for (let i = 0; i < positions.length; i++) {
-        const blocks = createChunkTerrain (positions[i].x, positions[i].y, positions[i].z)
+        const { blocks, blockGroups } = createChunkTerrain (positions[i].x, positions[i].y, positions[i].z)
         let sides = null, sidesAreSolid = null
 
         if (blocks) {
@@ -38,7 +38,7 @@ function createChunkTerrainForBatch ({ positions }) {
                 sides[j] = side, sidesAreSolid[j] = isSolid
                 transfers.push (side.buffer) }}
 
-        chunks[i] = { position: positions[i], blocks, sides, sidesAreSolid }}
+        chunks[i] = { position: positions[i], blocks, blockGroups, sides, sidesAreSolid }}
 
     self.postMessage ({ message: "createChunkTerrain", chunks }, transfers) }
 
@@ -52,24 +52,32 @@ const getElevation = (x, z, bx, bz) =>
 const hasTree = (x, z, bx, bz) =>
     treeNoise.noise2D (x * 16 + bx, z * 16 + bz) > 0.98
 
-function addBlock (blocks, x, y, z, blockId) {
-    if (x >= 0 && x < 16 && z >= 0 && z < 16 && y >= 0 && y < 16) {
-        blocks[getBlockIndex (x, y, z)] = blockId }}
+function addBlock (blocks, x, y, z, blockId, blockGroup = null) {
+    if (blockGroup)
+        blockGroup.push(getBlockIndex (x, y, z))
+    if (x >= 0 && x < 16 && z >= 0 && z < 16 && y >= 0 && y < 16)
+        blocks[getBlockIndex (x, y, z)] = blockId }
 
-function addTree (blocks, x, y, z) {
+function addTree (blocks, blockGroups, x, y, z) {
+    let blockGroup = x >= 0 && x < 16 && z >= 0 && z < 16 && y >= 0 && y < 16 ? [] : null
+
     for (let dx = -3; dx <= 3; dx++) {
         for (let dz = -3; dz <= 3; dz++) {
             for (let dy = 0; dy <= 3; dy++) {
                 if (dx*dx + dy*dy + dz*dz < 9) {
-                    addBlock (blocks, x + dx, y + dy + 4, z + dz, Blocks.Leaf.ID) }}}}
+                    addBlock (blocks, x + dx, y + dy + 4, z + dz, Blocks.Leaf.ID, blockGroup) }}}}
 
     for (let dy = 0; dy < 5; dy++) {
-        addBlock (blocks, x, y + dy, z, Blocks.Log.ID) }}
+        addBlock (blocks, x, y + dy, z, Blocks.Log.ID, blockGroup) }
+
+    if (blockGroup)
+        blockGroups.push(blockGroup) }
 
 
 
 function createChunkTerrain (x, y, z) {
     const blocks = new Int32Array (16 * 16 * 16)
+    const blockGroups = []
     let chunkContainsBlocks = false
 
     for (let bx = 0; bx < 16; bx++) {
@@ -85,10 +93,10 @@ function createChunkTerrain (x, y, z) {
             const elevation = getElevation (x, z, bx, bz) - y * 16
 
             if (elevation >= -8 && elevation < 15 && hasTree (x, z, bx, bz)) {
-                addTree (blocks, bx, elevation + 1, bz)
-               chunkContainsBlocks = true }}}
+                addTree (blocks, blockGroups, bx, elevation + 1, bz)
+                chunkContainsBlocks = true }}}
 
-    return chunkContainsBlocks ? blocks : null }
+    return { blocks: chunkContainsBlocks ? blocks : null, blockGroups }}
 
 
 function createChunkFaceData (blocks, direction) {
