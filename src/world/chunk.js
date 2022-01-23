@@ -238,17 +238,6 @@ export default class Chunk {
         this.world.scene.add (this.mesh) }
 
 
-    // Create the Cannon physics body for this chunk
-
-    createPhysicsBody () {
-        let boxes = []
-        for (let x = 0; x < 16; x++) {
-            for (let z = 0; z < 16; z++) {
-                boxes.push ({ x, z, minY: 0, maxY: x + z }) }}
-
-        this.world.physics.addChunk (uuid (), this.position, boxes) }
-
-
     // Helper methods
 
     refreshGeometry () {

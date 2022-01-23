@@ -14,7 +14,7 @@ export default class Entity {
     createMesh (properties) {
         return new Three.Mesh (this.createGeometry (properties), this.createMaterial (properties)) }
 
-    createMaterial ({ color }) {
+    createMaterial ({ color = 0xFFFFFF }) {
         return new Three.MeshLambertMaterial ({ color }) }
 
     createGeometry (properties) {
@@ -25,7 +25,7 @@ export default class Entity {
         else if (properties.shape === Shapes.CYLINDER)
             return new Three.CylinderGeometry (properties.radius, properties.radius, properties.height, 16) }
 
-    tick () {}
+    step () {}
 
     get uuid() {
         return this.mesh.uuid }}

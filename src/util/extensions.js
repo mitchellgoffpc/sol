@@ -3,6 +3,8 @@ import { Vector3 } from 'three'
 
 // Math extensions
 Math.clamp = (x, a, b) => Math.max (a, Math.min (b, x))
+Math.rad2deg = x => x / Math.PI * 180
+Math.deg2rad = x => x / 180 * Math.PI
 
 
 // Vector3 extensions

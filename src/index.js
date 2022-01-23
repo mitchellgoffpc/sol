@@ -13,6 +13,7 @@ import { range } from 'lodash'
 const ZERO = new Three.Vector3 (0, 0, 0)
 
 const KEY_JUMP = 32
+const KEY_DEBUG = 114
 const KEY_INVENTORY = 69
 const KEY_QUICKBAR = range (48, 58)
 const KEY_DIRECTIONS = {
@@ -38,6 +39,7 @@ window.addEventListener("load", () => {
     const player = new Player (world)
 
     let activeKeys = new Set ()
+    let showDebugView = false
     let controlsAreEnabled = false
     let lastRenderTimestamp = null
     let drawCount = 0, totalTime = 0
@@ -48,6 +50,10 @@ window.addEventListener("load", () => {
             document.body.requestPointerLock () .catch (_ => {})
         else if (!lock && controlsAreEnabled)
             document.exitPointerLock () }
+
+    const toggleDebugView = () => {
+        showDebugView = !showDebugView
+        document.querySelector ("#debug-view") .style.display = showDebugView ? 'block' : 'none' }
 
     // A little housekeeping
 
@@ -93,7 +99,9 @@ window.addEventListener("load", () => {
             player.handleSetQuickbarSlot (event)
         if (event.which === KEY_INVENTORY) {
             setPointerLock (!controlsAreEnabled)
-            player.handleShowInventory (controlsAreEnabled) }})
+            player.handleShowInventory (controlsAreEnabled) }
+        if (event.which === KEY_DEBUG) {
+            toggleDebugView () }})
 
     document.addEventListener ("keyup", event => {
         if (event.which in KEY_DIRECTIONS && controlsAreEnabled) {
@@ -112,10 +120,18 @@ window.addEventListener("load", () => {
         player.step (dt, getMovementVector (activeKeys))
         renderer.render (world.scene, player.camera)
 
+        if (showDebugView) {
+            let { x, y, z } = player.position
+            let { x: rx, y: ry } = player.rotation
+            document.getElementById ("position") .innerHTML =
+                `Position: x = ${x.toFixed (2)}, y = ${y.toFixed (2)}, z = ${z.toFixed (2)}`
+            document.getElementById ("rotation") .innerHTML =
+                `Rotation: rx = ${Math.rad2deg(rx) .toFixed (2)}˚, ry = ${Math.rad2deg(ry) .toFixed (2)}˚` }
+
         if (totalTime > 1000) {
             const fps = drawCount / totalTime * 1000
             const draws = renderer.info.render.calls
             totalTime = 0, drawCount = 0
-            document.querySelector ("#frame-rate") .innerHTML = `${fps.toFixed(2)}fps | ${draws} draw calls` }}
+            document.getElementById ("frame-rate") .innerHTML = `FPS: ${fps.toFixed(2)} | Draw calls: ${draws}` }}
 
     draw () })

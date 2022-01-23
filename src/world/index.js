@@ -6,6 +6,7 @@ import TerrainWorker from 'world/terrain.worker'
 import GeometryWorker from 'world/geometry.worker'
 import MachineryEngine from 'physics/machinery/engine'
 import Directions from 'util/directions'
+import Villager from 'entities/villager'
 
 const RENDER_DISTANCE = 20
 
@@ -44,7 +45,9 @@ export default class World {
         // Add event handlers
         this.terrainWorker.addEventListener ("message", this.handleTerrainWorkerMessage)
         this.geometryWorker.addEventListener ("message", this.handleGeometryWorkerMessage)
-        // this.physics.onStep (this.handleEntityUpdate)
+
+        // Test villager
+        this.spawnEntity ({ x: 0, y: 14, z: -64 }, new Villager ())
 
         // Generate chunks for the spawn area
         for (let x = -RENDER_DISTANCE - 1; x <= RENDER_DISTANCE + 1; x++) {
@@ -66,13 +69,7 @@ export default class World {
     spawnEntity (position, entity) {
         entity.mesh.position.set (position.x, position.y, position.z)
         this.scene.add (entity.mesh)
-        this.entities[entity.uuid] = entity
-
-        if (entity.needsGameTick) { /* tick */ }
-        if (entity.needsPhysicsBody) {
-            // this.physics.addEntity (entity.uuid, position, entity.properties)
-        }
-    }
+        this.entities[entity.uuid] = entity }
 
 
     // Methods for destroying blocks and entities
@@ -82,7 +79,6 @@ export default class World {
 
     destroyEntity (entity) {
         this.scene.remove (entity.mesh)
-        // this.physics.removeEntity (entity.uuid)
         delete this.entities[entity.uuid] }
 
 
@@ -170,22 +166,16 @@ export default class World {
 
             data.chunks.forEach (({ position, buffers, vertexBufferSize, blockFaceBufferSize }) => {
                 const chunk = this.chunks[coords (position.x, position.y, position.z)]
-                chunk.createBufferGeometry (buffers, vertexBufferSize, blockFaceBufferSize)
-
-                // if (this.shouldCreatePhysicsBodyForChunk (position))
-                //     this.physics.addChunk (position, buffers.vertexBuffer, vertexBufferSize)
-            }) }}
-
-    handleEntityUpdate = (uuid, position) => {
-        this.entities[uuid].mesh.position.copy (position) }
+                chunk.createBufferGeometry (buffers, vertexBufferSize, blockFaceBufferSize) }) }}
 
 
     // Update method
 
-    step (_) {
-        // this.physics.step (dt)
+    step () {
         this.machinery.step ()
-    }
+        for (let uuid in this.entities) {
+            if (this.entities[uuid].needsGameTick) {
+                this.entities[uuid].step () }}}
 
 
     // Miscellaneous helper methods

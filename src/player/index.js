@@ -82,7 +82,7 @@ export default class Player {
     handleUpdateRotation = (movementX, movementY) => {
         let rx = this.rotation.x - movementX / 500
         let ry = this.rotation.y + movementY / 500
-        this.rotation.x = rx % (Math.PI * 2)
+        this.rotation.x = (rx + (rx < 0 ? Math.PI * 2 : 0)) % (Math.PI * 2)
         this.rotation.y = Math.clamp (ry, -Math.PI / 2 + 0.0001, Math.PI / 2 - 0.0001)
         this.gaze = getDirectionVector (this.rotation) }
 
