@@ -10,6 +10,7 @@
     "start": "node app.js",
     "start-dev": "webpack-dev-server",
     "test": "jest tests",
+    "lint": "eslint src",
     "heroku-postbuild": "webpack -p --config ./webpack.config.js --progress"
   },
   "dependencies": {

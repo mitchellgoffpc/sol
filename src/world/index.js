@@ -7,11 +7,6 @@ import GeometryWorker from 'world/geometry.worker'
 import MachineryEngine from 'physics/machinery/engine'
 import Directions from 'util/directions'
 
-import Boiler from 'blocks/boiler'
-import Piston from 'blocks/machines/piston'
-import Counterweight from 'blocks/machines/counterweight'
-import Joint from 'physics/machinery/joints'
-
 const RENDER_DISTANCE = 20
 
 
@@ -45,17 +40,6 @@ export default class World {
         southLight.position.set (-100, 100, -50)
         this.scene.add (northLight)
         this.scene.add (southLight)
-
-        // // Machinery
-        // let piston = new Piston (.001)
-        // let beam = new Counterweight ()
-        // let boiler = new Boiler ()
-        // this.machinery.connect(piston.connections.head, beam.connections.beam)
-        //
-        // boiler.mesh.position.set (2, 46, 14)
-        // this.scene.add (boiler.mesh)
-        // this.placeMachine (new Three.Vector3 (5, 46, 14), piston)
-        // this.placeMachine (new Three.Vector3 (8, 46, 14), beam)
 
         // Add event handlers
         this.terrainWorker.addEventListener ("message", this.handleTerrainWorkerMessage)

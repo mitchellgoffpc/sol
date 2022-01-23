@@ -1,5 +1,5 @@
 import { hexToRgb } from 'util/colors'
-import { map, chunk, times, flatten, fromPairs, pickBy } from 'lodash'
+import { map, times, flatten, fromPairs, pickBy } from 'lodash'
 
 // Helper functions
 const hexToFloats = hexCode => {
