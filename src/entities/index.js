@@ -6,9 +6,6 @@ const GRAVITY          = new Three.Vector3 (0, -9.81/50, 0)
 const DEFAULT_ROTATION = new Three.Vector2 (0, 0)
 const DEFAULT_VELOCITY = new Three.Vector3 (0, 0, 0)
 
-const getRotatedMovementVector = (movement, rotation) =>
-    movement.clone () .applyAxisAngle (UP, rotation.x) .normalize ()
-
 
 // Entity base class
 
@@ -26,7 +23,7 @@ export default class Entity {
         this.position = position.clone ()
         this.rotation = rotation.clone ()
         this.velocity = velocity.clone ()
-        this.mesh.position.set (position.x, position.y, position.z)
+        this.mesh.position.copy (position)
         world.addEntity (this) }
 
     // Geometry helper functions
@@ -47,18 +44,14 @@ export default class Entity {
 
     // Movement helper functions
 
-    move (desiredMovement, dt) {
+    move (desiredMovement) {
         let currentChunk = this.world.getChunkAtPosition (this.position)
         let chunkIsLoaded = currentChunk && currentChunk.isLoaded ()
 
-        // Update our velocity
+        // Update our velocity and position
         this.velocity = this.getValidMovement (this.velocity.clone () .addScaledVector (GRAVITY, this.hasGravity && chunkIsLoaded ? 1/120 : 0))
-
-        // Update our position
-        this.position.add (this.getValidMovement
-            (getRotatedMovementVector (desiredMovement, this.rotation)
-                .multiplyScalar (dt / 120)
-                .add (this.velocity))) }
+        this.position.add (this.getValidMovement (desiredMovement.applyAxisAngle (UP, this.rotation.x) .add (this.velocity)))
+        this.mesh.position.set (this.position.x, this.position.y + 1, this.position.z) }
 
     getValidMovement (movement) {
         // Floor collision check

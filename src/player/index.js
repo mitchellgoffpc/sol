@@ -120,7 +120,7 @@ export default class Player {
 
     step (dt, desiredMovement) {
         if (!this.flying) desiredMovement.setY (0)
-        this.entity.move (desiredMovement, dt)
+        this.entity.move (desiredMovement .normalize () .multiplyScalar (dt / 120))
 
         // Update the camera's position and rotation
         this.camera.position.set (this.position.x, this.position.y + 1.8, this.position.z)
