@@ -46,8 +46,9 @@ export default class World {
         this.terrainWorker.addEventListener ("message", this.handleTerrainWorkerMessage)
         this.geometryWorker.addEventListener ("message", this.handleGeometryWorkerMessage)
 
-        // Test villager
-        this.spawnEntity ({ x: 0, y: 14, z: -64 }, new Villager ())
+        // Create a test villager
+        const villager = new Villager ()
+        villager.spawn (this, new Three.Vector3 (0, 14, -64))
 
         // Generate chunks for the spawn area
         for (let x = -RENDER_DISTANCE - 1; x <= RENDER_DISTANCE + 1; x++) {
@@ -66,8 +67,7 @@ export default class World {
         this.scene.add (machine.mesh)
         this.machinery.addMachine (machine) }
 
-    spawnEntity (position, entity) {
-        entity.mesh.position.set (position.x, position.y, position.z)
+    addEntity (entity) {
         this.scene.add (entity.mesh)
         this.entities[entity.uuid] = entity }
 

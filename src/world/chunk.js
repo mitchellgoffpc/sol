@@ -1,6 +1,4 @@
 import * as Three from 'three'
-import { v4 as uuid } from 'uuid'
-
 import Blocks from 'blocks'
 import Directions from 'util/directions'
 import { getVerticesForSide } from 'util/geometry'
